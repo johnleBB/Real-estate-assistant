@@ -1,0 +1,3962 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulder — Kjøpsassistent</title>
+  <style>
+    /* =====================================================
+       BULDER DESIGN TOKENS
+    ===================================================== */
+    :root {
+      --primitive-blue-100: #e3ecff;
+      --primitive-blue-200: #a3c3ff;
+      --primitive-blue-300: #6998ff;
+      --primitive-blue-400: #3063ff;
+      --primitive-blue-500: #0c2af4;
+      --primitive-blue-600: #0926d6;
+      --primitive-blue-700: #0820b5;
+      --primitive-blue-800: #05188a;
+      --primitive-blue-900: #05105c;
+      --primitive-dark-blue-100: #959bc0;
+      --primitive-dark-blue-200: #707c9e;
+      --primitive-dark-blue-300: #4c5674;
+      --primitive-dark-blue-400: #3e4965;
+      --primitive-dark-blue-500: #333e5c;
+      --primitive-dark-blue-600: #262f47;
+      --primitive-dark-blue-700: #1a2037;
+      --primitive-dark-blue-800: #0f1729;
+      --primitive-dark-blue-900: #070912;
+      --primitive-green-100: #e0ffe1;
+      --primitive-green-200: #ccffcc;
+      --primitive-green-300: #b9ffba;
+      --primitive-green-400: #a6ffa5;
+      --primitive-green-500: #85ff86;
+      --primitive-green-600: #61d562;
+      --primitive-green-700: #3aa53a;
+      --primitive-green-800: #266b26;
+      --primitive-green-900: #0b300b;
+      --primitive-grey-100: #fafbff;
+      --primitive-grey-200: #f4f6ff;
+      --primitive-grey-300: #eaeffa;
+      --primitive-grey-400: #dce1f3;
+      --primitive-grey-500: #d1d7e5;
+      --primitive-grey-600: #bfc4d4;
+      --primitive-grey-700: #b4bac8;
+      --primitive-grey-800: #9298a7;
+      --primitive-grey-900: #747a89;
+      --primitive-red-100: #ffeaec;
+      --primitive-red-200: #ffccd0;
+      --primitive-red-300: #ffa8af;
+      --primitive-red-400: #fe8088;
+      --primitive-red-500: #fe4d5b;
+      --primitive-red-600: #bd2a37;
+      --primitive-yellow-100: #ffffde;
+      --primitive-yellow-200: #fff8bf;
+      --primitive-yellow-500: #fae84e;
+      --primitive-yellow-600: #e2c546;
+
+      /* DARK THEME as default */
+      --color-primary: #3063ff;
+      --color-on-primary: #fafbff;
+      --color-secondary: #85ff86;
+      --color-on-secondary: #0f1729;
+      --color-background: #0f1729;
+      --color-on-background: #fafbff;
+      --color-surface: #0f1729;
+      --color-on-surface: #fafbff;
+      --color-on-surface-variant: #9298a7;
+      --color-surface-container: #1a2037;
+      --color-surface-container-high: #262f47;
+      --color-surface-container-highest: #1a2037;
+      --color-error: #fe4d5b;
+      --color-on-error: #0f1729;
+      --color-outline: #262f47;
+      --color-outline-variant: #262f47;
+      --color-positive: #61d562;
+      --color-negative: #fe4d5b;
+      --color-warning: #fae84e;
+      --color-active-bottom-nav: #fe4d5b;
+      --color-inactive-bottom-nav: #fafbff;
+      --color-bulder: #1a2037;
+      --color-on-bulder: #fe4d5b;
+      --shadow: 0px 2px 20px 0px rgba(15, 23, 41, 0.7);
+      --shadow-botnav: 0px -1px 10px 0px rgba(15, 23, 41, 0.7);
+
+      --space-none: 0px;
+      --space-xsmall: 2px;
+      --space-small: 4px;
+      --space-medium: 8px;
+      --space-large: 16px;
+      --space-xlarge: 24px;
+      --space-xxlarge: 32px;
+      --radius-small: 4px;
+      --radius-standard: 10px;
+      --radius-large: 16px;
+    }
+
+    /* =====================================================
+       TYPOGRAPHY
+    ===================================================== */
+    body {
+      font-family: 'Aeonik', system-ui, -apple-system, sans-serif;
+      color: var(--color-on-surface);
+    }
+    .text-large-title { font-size: 42px; font-weight: 500; letter-spacing: 0.05em; line-height: normal; }
+    .text-h1          { font-size: 32px; font-weight: 700; letter-spacing: 0.05em; line-height: normal; }
+    .text-h2          { font-size: 26px; font-weight: 700; letter-spacing: 0.05em; line-height: normal; }
+    .text-h3          { font-size: 20px; font-weight: 700; letter-spacing: 0.05em; line-height: 156%; }
+    .text-subtitle    { font-size: 18px; font-weight: 500; letter-spacing: 0.05em; line-height: 156%; }
+    .text-body        { font-size: 16px; font-weight: 500; letter-spacing: 0.03em; line-height: 144%; }
+    .text-body-2      { font-size: 14px; font-weight: 400; letter-spacing: 0.03em; line-height: 144%; }
+    .text-button      { font-size: 18px; font-weight: 500; letter-spacing: 0.04em; line-height: 144%; }
+    .text-caption     { font-size: 14px; font-weight: 400; letter-spacing: 0.03em; line-height: 144%; }
+    .text-overline    { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; line-height: normal; text-transform: uppercase; }
+
+    /* =====================================================
+       RESET & GLOBAL
+    ===================================================== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: #070912;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 0;
+    }
+
+    /* =====================================================
+       PHONE SHELL
+    ===================================================== */
+    .phone-shell {
+      width: 375px;
+      height: 812px;
+      background: var(--color-background);
+      border-radius: 44px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 0 1px #262f47, 0 32px 80px rgba(0,0,0,0.7);
+    }
+
+    /* Status bar */
+    .status-bar {
+      height: 44px;
+      background: var(--color-background);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+    .status-bar-time {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-on-surface);
+    }
+    .status-bar-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--color-on-surface);
+    }
+    .status-bar-icons svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* =====================================================
+       HEADER
+    ===================================================== */
+    .app-header {
+      height: 56px;
+      background: var(--color-background);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-large);
+      gap: var(--space-medium);
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--color-outline);
+    }
+    .header-back {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--color-surface-container);
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .header-back svg { width: 20px; height: 20px; stroke: var(--color-on-surface); fill: none; }
+    .header-title-block {
+      flex: 1;
+      min-width: 0;
+    }
+    .header-overline {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-active-bottom-nav);
+      line-height: 1;
+    }
+    .header-address {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-on-surface);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .header-actions {
+      display: flex;
+      gap: var(--space-medium);
+    }
+    .header-icon-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--color-surface-container);
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .header-icon-btn svg { width: 20px; height: 20px; stroke: var(--color-on-surface); fill: none; }
+
+    /* =====================================================
+       PROPERTY HERO
+    ===================================================== */
+    .hero {
+      position: relative;
+      height: 180px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .hero img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .hero-gradient {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 30%, rgba(15,23,41,0.85) 100%);
+    }
+    .hero-badge {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: var(--color-secondary);
+      color: var(--color-on-secondary);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+    .hero-price-block {
+      position: absolute;
+      bottom: 12px; left: 16px; right: 16px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    .hero-price {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+    .hero-price-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.7);
+      margin-top: 2px;
+    }
+    .hero-photo-count {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 20px;
+      padding: 4px 10px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .hero-photo-count svg { width: 14px; height: 14px; stroke: #fff; fill: none; }
+
+    /* =====================================================
+       TAB BAR (SEGMENTED)
+    ===================================================== */
+    .tab-bar {
+      display: flex;
+      background: var(--color-surface-container);
+      border-bottom: 1px solid var(--color-outline);
+      flex-shrink: 0;
+    }
+    .tab-item {
+      flex: 1;
+      padding: 14px 4px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--color-on-surface-variant);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      font-family: inherit;
+    }
+    .tab-item.active {
+      color: var(--color-secondary);
+      border-bottom-color: var(--color-secondary);
+    }
+
+    /* =====================================================
+       SCROLLABLE CONTENT
+    ===================================================== */
+    .content-scroll {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--color-background);
+      padding: var(--space-large);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-large);
+      scrollbar-width: none;
+    }
+    .content-scroll::-webkit-scrollbar { display: none; }
+
+    /* =====================================================
+       CARDS
+    ===================================================== */
+    .card {
+      background: var(--color-surface-container);
+      border-radius: var(--radius-large);
+      padding: var(--space-large);
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-medium);
+      margin-bottom: var(--space-large);
+    }
+    .card-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-standard);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-icon svg { width: 20px; height: 20px; }
+    .card-icon.blue   { background: rgba(48,99,255,0.15); }
+    .card-icon.blue svg { stroke: var(--color-primary); fill: none; }
+    .card-icon.green  { background: rgba(97,213,98,0.15); }
+    .card-icon.green svg { stroke: var(--color-positive); fill: none; }
+    .card-icon.yellow { background: rgba(250,232,78,0.15); }
+    .card-icon.yellow svg { stroke: var(--color-warning); fill: none; }
+    .card-icon.red    { background: rgba(254,77,91,0.15); }
+    .card-icon.red svg { stroke: var(--color-negative); fill: none; }
+    .card-icon.purple { background: rgba(147,97,248,0.15); }
+    .card-icon.purple svg { stroke: #9361f8; fill: none; }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+      letter-spacing: 0.03em;
+    }
+    .card-subtitle {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--color-on-surface-variant);
+      margin-top: 2px;
+    }
+
+    /* Key info grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-medium);
+    }
+    .info-item {
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+      padding: 12px;
+    }
+    .info-item.wide {
+      grid-column: 1 / -1;
+    }
+    .info-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-on-surface-variant);
+      margin-bottom: 4px;
+    }
+    .info-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-on-surface);
+    }
+    .info-value.green { color: var(--color-positive); }
+    .info-value.red   { color: var(--color-negative); }
+
+    /* Feature list */
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-medium);
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .feature-bullet {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--color-secondary);
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+    .feature-text {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--color-on-surface);
+      line-height: 1.5;
+    }
+    .feature-sub {
+      font-size: 12px;
+      color: var(--color-on-surface-variant);
+      margin-top: 2px;
+    }
+
+    /* TG findings */
+    .tg-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .tg-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+    }
+    .tg-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 100px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .tg-badge.tg1 {
+      background: rgba(97,213,98,0.15);
+      color: var(--color-positive);
+    }
+    .tg-badge.tg2 {
+      background: rgba(250,232,78,0.15);
+      color: var(--color-warning);
+    }
+    .tg-badge.tg3 {
+      background: rgba(254,77,91,0.15);
+      color: var(--color-negative);
+    }
+    .tg-content {}
+    .tg-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-on-surface);
+      margin-bottom: 3px;
+    }
+    .tg-desc {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--color-on-surface-variant);
+      line-height: 1.45;
+    }
+
+    /* ── Neighbor cases (Nabosøknader) ── */
+    .neighbor-case-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .neighbor-case-item {
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+      padding: 10px 12px;
+      border-left: 3px solid transparent;
+    }
+    .neighbor-case-item.high   { border-left-color: var(--color-negative); }
+    .neighbor-case-item.medium { border-left-color: var(--color-warning); }
+    .neighbor-case-item.low    { border-left-color: var(--color-positive); }
+    .neighbor-case-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    .neighbor-case-address {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-on-surface);
+    }
+    .neighbor-impact-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .neighbor-impact-badge.high   { background: rgba(254,77,91,0.15); color: var(--color-negative); }
+    .neighbor-impact-badge.medium { background: rgba(250,232,78,0.15); color: var(--color-warning); }
+    .neighbor-impact-badge.low    { background: rgba(97,213,98,0.15);  color: var(--color-positive); }
+    .neighbor-case-meta {
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+      margin-bottom: 5px;
+    }
+    .neighbor-case-desc {
+      font-size: 12px;
+      color: var(--color-on-surface-variant);
+      line-height: 1.45;
+    }
+    .neighbor-cases-empty {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(97,213,98,0.08);
+      border: 1px solid rgba(97,213,98,0.20);
+      border-radius: var(--radius-standard);
+    }
+    .neighbor-cases-empty svg { flex-shrink: 0; color: var(--color-positive); }
+    .neighbor-cases-empty-text { font-size: 13px; color: var(--color-positive); font-weight: 600; }
+    .neighbor-cases-empty-sub  { font-size: 12px; color: var(--color-on-surface-variant); margin-top: 1px; }
+    .neighbor-source {
+      font-size: 10px;
+      color: var(--color-on-surface-variant);
+      margin-top: 10px;
+      text-align: right;
+      opacity: 0.7;
+    }
+
+    /* ── Price analysis (Oversikt) ── */
+    .price-compare {
+      display: flex;
+      gap: 8px;
+      margin: 2px 0 10px;
+    }
+    .price-col {
+      flex: 1;
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+      padding: 10px 12px;
+    }
+    .price-col-label {
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+      margin-bottom: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .price-col-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+    }
+    .price-col-value.highlight { color: var(--color-secondary); }
+    .price-verdict {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-standard);
+    }
+    .price-verdict.overpriced {
+      background: rgba(254,77,91,0.10);
+      border: 1px solid rgba(254,77,91,0.22);
+    }
+    .price-verdict.underpriced {
+      background: rgba(97,213,98,0.10);
+      border: 1px solid rgba(97,213,98,0.22);
+    }
+    .price-verdict.fair {
+      background: rgba(48,99,255,0.10);
+      border: 1px solid rgba(48,99,255,0.22);
+    }
+    .price-verdict-icon {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .price-verdict.overpriced .price-verdict-icon { color: var(--color-negative); }
+    .price-verdict.underpriced .price-verdict-icon { color: var(--color-positive); }
+    .price-verdict.fair .price-verdict-icon { color: var(--color-primary); }
+    .price-verdict-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .price-verdict.overpriced .price-verdict-title { color: var(--color-negative); }
+    .price-verdict.underpriced .price-verdict-title { color: var(--color-positive); }
+    .price-verdict.fair .price-verdict-title { color: var(--color-primary); }
+    .price-verdict-sub {
+      font-size: 12px;
+      color: var(--color-on-surface-variant);
+      line-height: 1.45;
+    }
+
+    /* ── Realistic bid price (Visning) ── */
+    .bid-range-box {
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+      padding: 14px;
+      margin: 10px 0 8px;
+      text-align: center;
+    }
+    .bid-range-label {
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .bid-range-value {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--color-secondary);
+      letter-spacing: -0.3px;
+    }
+    .bid-meta-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .bid-meta-item {
+      flex: 1;
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+      padding: 9px 10px;
+    }
+    .bid-meta-label {
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+      margin-bottom: 2px;
+    }
+    .bid-meta-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-on-surface);
+    }
+    .competition-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    .competition-dot.low { background: var(--color-positive); }
+    .competition-dot.medium { background: var(--color-warning); }
+    .competition-dot.high { background: var(--color-negative); }
+    .bid-strategy-box {
+      background: rgba(48,99,255,0.08);
+      border: 1px solid rgba(48,99,255,0.18);
+      border-radius: var(--radius-standard);
+      padding: 10px 12px;
+    }
+    .bid-strategy-label {
+      font-size: 10px;
+      color: var(--color-primary);
+      font-weight: 700;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .bid-strategy-text {
+      font-size: 13px;
+      color: var(--color-on-surface-variant);
+      line-height: 1.5;
+    }
+
+    /* Economy table */
+    .econ-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .econ-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--color-outline);
+    }
+    .econ-row:last-child { border-bottom: none; }
+    .econ-row.total {
+      padding-top: 12px;
+      margin-top: 4px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .econ-label {
+      font-size: 14px;
+      color: var(--color-on-surface-variant);
+    }
+    .econ-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-on-surface);
+    }
+    .econ-row.total .econ-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+    }
+    .econ-row.total .econ-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-secondary);
+    }
+
+    /* Monthly costs */
+    .monthly-block {
+      margin-top: var(--space-large);
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+      padding: 14px;
+    }
+    .monthly-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-on-surface-variant);
+      margin-bottom: 10px;
+    }
+    .monthly-total {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+      letter-spacing: 0.02em;
+    }
+    .monthly-sub {
+      font-size: 12px;
+      color: var(--color-on-surface-variant);
+      margin-top: 2px;
+      margin-bottom: 14px;
+    }
+    .monthly-breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .monthly-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--color-on-surface-variant);
+    }
+    .monthly-row span:last-child {
+      color: var(--color-on-surface);
+      font-weight: 500;
+    }
+
+    /* =====================================================
+       CHECKLIST TAB
+    ===================================================== */
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius-standard);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .check-item:hover { background: var(--color-surface-container-high); }
+    .check-item.checked .check-text { color: var(--color-on-surface-variant); text-decoration: line-through; }
+    .check-box {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      border: 2px solid var(--color-outline-variant);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: all 0.15s;
+    }
+    .check-item.checked .check-box {
+      background: var(--color-secondary);
+      border-color: var(--color-secondary);
+    }
+    .check-box svg { width: 14px; height: 14px; stroke: var(--color-on-secondary); fill: none; display: none; }
+    .check-item.checked .check-box svg { display: block; }
+    .check-text {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--color-on-surface);
+      line-height: 1.5;
+    }
+    .check-priority {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-top: 3px;
+    }
+    .check-priority.high { color: var(--color-negative); }
+    .check-priority.medium { color: var(--color-warning); }
+    .check-priority.low { color: var(--color-positive); }
+
+    /* Questions */
+    .q-category {
+      margin-bottom: var(--space-large);
+    }
+    .q-category-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-medium);
+      margin-bottom: 10px;
+      padding: 0 4px;
+    }
+    .q-category-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-on-surface-variant);
+    }
+    .q-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .q-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px;
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .q-item:hover { opacity: 0.85; }
+    .q-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--color-surface-container);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-on-surface-variant);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .q-text {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--color-on-surface);
+      line-height: 1.5;
+      flex: 1;
+    }
+    .q-copy-btn {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      background: none;
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .q-copy-btn svg { width: 16px; height: 16px; stroke: var(--color-on-surface-variant); fill: none; }
+
+    /* =====================================================
+       AGENT CARD (inside Del 2)
+    ===================================================== */
+    .agent-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+      padding: 12px;
+      margin-bottom: var(--space-large);
+    }
+    .agent-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primitive-dark-blue-400), var(--primitive-dark-blue-600));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primitive-grey-100);
+      flex-shrink: 0;
+    }
+    .agent-info { flex: 1; }
+    .agent-name { font-size: 14px; font-weight: 600; color: var(--color-on-surface); }
+    .agent-company { font-size: 12px; color: var(--color-on-surface-variant); margin-top: 1px; }
+    .agent-actions { display: flex; gap: 6px; }
+    .agent-btn {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .agent-btn svg { width: 16px; height: 16px; stroke: #fff; fill: none; }
+
+    /* section separator */
+    .section-sep {
+      height: 1px;
+      background: var(--color-outline);
+      margin: var(--space-xsmall) 0;
+    }
+
+    /* tab content visibility */
+    .tab-content { display: none; }
+    .tab-content.active { display: flex; flex-direction: column; gap: var(--space-large); }
+
+    /* =====================================================
+       BOTTOM NAVIGATION
+    ===================================================== */
+    .bottom-nav {
+      height: 76px;
+      background: var(--color-surface-container);
+      box-shadow: var(--shadow-botnav);
+      display: flex;
+      align-items: flex-start;
+      padding-top: 10px;
+      flex-shrink: 0;
+      border-top: 1px solid var(--color-outline);
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      position: relative;
+    }
+    .nav-icon {
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .nav-icon svg { width: 22px; height: 22px; stroke: var(--color-inactive-bottom-nav); fill: none; }
+    .nav-item.active .nav-icon svg { stroke: var(--color-active-bottom-nav); }
+    .nav-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: var(--color-inactive-bottom-nav);
+    }
+    .nav-item.active .nav-label { color: var(--color-active-bottom-nav); }
+    .nav-badge {
+      position: absolute;
+      top: -3px; right: -5px;
+      background: var(--color-active-bottom-nav);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      width: 15px; height: 15px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* =====================================================
+       VIEWING DATE CHIP
+    ===================================================== */
+    .visning-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(48,99,255,0.15);
+      border: 1px solid rgba(48,99,255,0.3);
+      border-radius: 100px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-primary);
+      margin-bottom: var(--space-large);
+    }
+    .visning-chip svg { width: 14px; height: 14px; stroke: currentColor; fill: none; }
+
+    /* Progress indicator for checklist */
+    .progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-medium);
+    }
+    .progress-label {
+      font-size: 12px;
+      color: var(--color-on-surface-variant);
+    }
+    .progress-count {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-secondary);
+    }
+    .progress-bar-track {
+      height: 4px;
+      background: var(--color-surface-container-high);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: var(--space-large);
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--color-secondary);
+      border-radius: 100px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* =====================================================
+       NABOLAG TAB
+    ===================================================== */
+
+    /* Map placeholder */
+    .map-container {
+      position: relative;
+      height: 160px;
+      border-radius: var(--radius-standard);
+      overflow: hidden;
+      background: #1a2440;
+      margin-bottom: var(--space-large);
+    }
+    .map-svg { width: 100%; height: 100%; }
+    .map-overlay-badge {
+      position: absolute;
+      bottom: 10px; right: 10px;
+      background: var(--color-surface-container);
+      border-radius: var(--radius-small);
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-on-surface-variant);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .map-overlay-badge svg { width: 12px; height: 12px; stroke: currentColor; fill: none; }
+    .map-pin-home {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -60%);
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .map-pin-dot {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--color-active-bottom-nav);
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 3px rgba(254,77,91,0.3);
+    }
+    .map-pin-label {
+      background: var(--color-active-bottom-nav);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+    }
+    .map-sold-dot {
+      position: absolute;
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--color-secondary);
+      border: 1.5px solid rgba(0,0,0,0.3);
+    }
+
+    /* Price stats row */
+    .price-stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--space-medium);
+      margin-bottom: var(--space-large);
+    }
+    .price-stat-item {
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+      padding: 12px 10px;
+      text-align: center;
+    }
+    .price-stat-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+      line-height: 1.2;
+    }
+    .price-stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-on-surface-variant);
+      margin-top: 3px;
+    }
+    .price-stat-change {
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .price-stat-change.up { color: var(--color-positive); }
+    .price-stat-change.down { color: var(--color-negative); }
+
+    /* Sparkline chart */
+    .sparkline-wrap {
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+      padding: 14px;
+      margin-bottom: var(--space-large);
+    }
+    .sparkline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .sparkline-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-on-surface);
+    }
+    .sparkline-subtitle {
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+      margin-top: 2px;
+    }
+    .sparkline-period-pills {
+      display: flex; gap: 4px;
+    }
+    .period-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 100px;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      background: none;
+      color: var(--color-on-surface-variant);
+    }
+    .period-pill.active {
+      background: var(--color-primary);
+      color: #fff;
+    }
+    .sparkline-svg { width: 100%; height: 70px; }
+    .sparkline-x-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+    .sparkline-x-label {
+      font-size: 9px;
+      color: var(--color-on-surface-variant);
+      font-weight: 500;
+    }
+
+    /* Sold nearby cards */
+    .sold-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+    }
+    .sold-card-thumb {
+      width: 56px; height: 56px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--color-outline);
+    }
+    .sold-card-info { flex: 1; min-width: 0; }
+    .sold-card-address {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-on-surface);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sold-card-meta {
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+      margin-top: 2px;
+    }
+    .sold-card-right { text-align: right; flex-shrink: 0; }
+    .sold-card-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+    }
+    .sold-card-sqm {
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+      margin-top: 2px;
+    }
+    .sold-card-date {
+      font-size: 10px;
+      color: var(--color-positive);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    /* Facilities list */
+    .facility-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .facility-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 4px;
+      border-bottom: 1px solid var(--color-outline);
+    }
+    .facility-item:last-child { border-bottom: none; }
+    .facility-icon {
+      width: 34px; height: 34px;
+      border-radius: var(--radius-standard);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .facility-icon svg { width: 18px; height: 18px; fill: none; }
+    .facility-icon.transport { background: rgba(48,99,255,0.15); }
+    .facility-icon.transport svg { stroke: var(--color-primary); }
+    .facility-icon.shop { background: rgba(133,255,134,0.12); }
+    .facility-icon.shop svg { stroke: var(--color-positive); }
+    .facility-icon.school { background: rgba(250,232,78,0.15); }
+    .facility-icon.school svg { stroke: var(--color-warning); }
+    .facility-icon.health { background: rgba(254,77,91,0.15); }
+    .facility-icon.health svg { stroke: var(--color-negative); }
+    .facility-name {
+      flex: 1;
+      font-size: 14px;
+      color: var(--color-on-surface);
+    }
+    .facility-sub {
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+      margin-top: 1px;
+    }
+    .facility-dist {
+      text-align: right;
+    }
+    .facility-dist-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-on-surface);
+    }
+    .facility-dist-walk {
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+      margin-top: 1px;
+    }
+
+    /* School rating */
+    .school-rating {
+      display: flex; gap: 2px; margin-top: 2px;
+    }
+    .star { font-size: 10px; }
+    .star.filled { color: var(--color-warning); }
+    .star.empty  { color: var(--color-outline); }
+
+    /* Demographic chips */
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-medium);
+    }
+    .demo-item {
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+      padding: 12px;
+    }
+    .demo-icon { font-size: 20px; margin-bottom: 6px; }
+    .demo-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+    }
+    .demo-label {
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+      margin-top: 2px;
+    }
+
+    /* Noise/sun condition row */
+    .condition-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-medium);
+    }
+    .condition-item {
+      background: var(--color-surface-container-high);
+      border-radius: var(--radius-standard);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .condition-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-on-surface-variant);
+    }
+    .condition-header svg { width: 14px; height: 14px; fill: none; }
+    .condition-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+    }
+    .condition-bar-track {
+      height: 6px;
+      border-radius: 100px;
+      background: var(--color-outline);
+      overflow: hidden;
+    }
+    .condition-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+    }
+    .condition-bar-fill.green  { background: var(--color-positive); }
+    .condition-bar-fill.yellow { background: var(--color-warning); }
+    .condition-bar-fill.red    { background: var(--color-negative); }
+
+    /* =====================================================
+       TWO-SCREEN NAVIGATION
+    ===================================================== */
+    .phone-shell { overflow: hidden; }
+
+    .screens-wrapper {
+      display: flex;
+      width: 750px; /* 2 × 375px */
+      height: 100%;
+      transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .screen {
+      width: 375px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: var(--color-background);
+    }
+
+    /* =====================================================
+       LIST SCREEN
+    ===================================================== */
+
+    /* List header */
+    .list-header {
+      height: 56px;
+      background: var(--color-background);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-large);
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--color-outline);
+    }
+    .list-header-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+      letter-spacing: 0.03em;
+    }
+    .list-header-actions { display: flex; gap: 8px; }
+    .list-icon-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--color-surface-container);
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .list-icon-btn svg { width: 20px; height: 20px; stroke: var(--color-on-surface); fill: none; }
+
+    /* Financing card */
+    .financing-card {
+      margin: var(--space-large);
+      border-radius: var(--radius-large);
+      padding: 16px 18px;
+      background: linear-gradient(135deg, #0820b5 0%, #1a3fff 60%, #3063ff 100%);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .financing-card::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .financing-card::after {
+      content: '';
+      position: absolute;
+      bottom: -30px; right: 30px;
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .financing-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .financing-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+    }
+    .financing-bank {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.05em;
+    }
+    .financing-amount {
+      font-size: 30px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .financing-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .financing-valid {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+    }
+    .financing-valid svg { width: 13px; height: 13px; stroke: rgba(255,255,255,0.7); fill: none; }
+    .financing-badge {
+      background: rgba(133,255,134,0.2);
+      color: #85ff86;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 100px;
+      border: 1px solid rgba(133,255,134,0.3);
+    }
+    .financing-legend {
+      display: flex;
+      gap: var(--space-large);
+      margin: 0 var(--space-large);
+      margin-bottom: var(--space-medium);
+      flex-shrink: 0;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-on-surface-variant);
+    }
+    .legend-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .legend-dot.ok  { background: var(--color-positive); }
+    .legend-dot.over { background: var(--color-negative); }
+
+    /* Filter chips */
+    .filter-row {
+      display: flex;
+      gap: 6px;
+      padding: 0 var(--space-large) var(--space-medium);
+      overflow-x: auto;
+      flex-shrink: 0;
+      scrollbar-width: none;
+    }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 13px;
+      border-radius: 100px;
+      border: 1.5px solid var(--color-outline);
+      background: var(--color-surface-container);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-on-surface-variant);
+      white-space: nowrap;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .filter-chip.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+    .filter-chip svg { width: 13px; height: 13px; stroke: currentColor; fill: none; }
+    .filter-chip.has-filter {
+      border-color: var(--color-secondary);
+      color: var(--color-secondary);
+    }
+
+    /* Property list */
+    .prop-list {
+      flex: 1;
+      min-height: 0;          /* ← lar flexbox krympe dette elementet */
+      overflow-y: auto;
+      padding: 0 var(--space-large) var(--space-large);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scrollbar-width: none;
+    }
+    .prop-list::-webkit-scrollbar { display: none; }
+    .prop-count {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-on-surface-variant);
+      margin-bottom: 2px;
+      flex-shrink: 0;
+      padding: 0 var(--space-large) 6px;
+    }
+
+    /* ── Property card — solgt.no-inspired ── */
+    .prop-card {
+      background: var(--color-surface-container);
+      border-radius: var(--radius-large);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      border: 1.5px solid transparent;
+      position: relative;
+      box-shadow: var(--shadow);
+      flex-shrink: 0;         /* ← kort komprimeres aldri */
+    }
+    .prop-card:active { transform: scale(0.985); }
+    .prop-card.active-prop { border-color: rgba(48,99,255,0.5); }
+
+    .prop-card-img {
+      width: 100%; height: 175px;
+      object-fit: cover;
+      display: block;
+    }
+    .prop-card-img-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 175px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    /* Floating chips on image */
+    .prop-card-new {
+      position: absolute;
+      top: 12px; left: 12px;
+      background: var(--color-active-bottom-nav);
+      color: #fff;
+      font-size: 10px; font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 100px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .prop-type-chip {
+      position: absolute;
+      top: 12px; left: 12px;
+      background: rgba(15,23,41,0.72);
+      backdrop-filter: blur(6px);
+      color: rgba(255,255,255,0.92);
+      font-size: 11px; font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 100px;
+      letter-spacing: 0.04em;
+    }
+    .prop-type-chip.has-new { left: 56px; }
+    .prop-card-saved {
+      position: absolute;
+      top: 10px; right: 10px;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(15,23,41,0.65);
+      backdrop-filter: blur(4px);
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .prop-card-saved:active { transform: scale(1.2); }
+    .prop-card-saved svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; transition: all 0.2s; }
+    .prop-card-saved.saved svg { fill: var(--color-active-bottom-nav); stroke: var(--color-active-bottom-nav); }
+
+    /* Card body */
+    .prop-card-body { padding: 13px 14px 14px; }
+
+    .prop-card-price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    .prop-card-price {
+      font-size: 20px; font-weight: 700;
+      color: var(--color-on-surface);
+      line-height: 1;
+    }
+    .budget-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 3px 9px; border-radius: 100px;
+      font-size: 11px; font-weight: 700;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .budget-badge.ok   { background: rgba(97,213,98,0.15);  color: var(--color-positive); }
+    .budget-badge.over { background: rgba(254,77,91,0.12);  color: var(--color-negative); }
+    .budget-badge svg  { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+    .prop-card-address {
+      font-size: 15px; font-weight: 600;
+      color: var(--color-on-surface);
+      margin-bottom: 2px; line-height: 1.3;
+    }
+    .prop-card-neighborhood {
+      font-size: 12px;
+      color: var(--color-on-surface-variant);
+      margin-bottom: 10px;
+    }
+
+    /* Specs row — icon + value */
+    .prop-card-specs {
+      display: flex; align-items: center;
+      gap: 0;
+      padding: 10px 0 10px;
+      border-top: 1px solid var(--color-outline);
+      border-bottom: 1px solid var(--color-outline);
+      margin-bottom: 10px;
+    }
+    .spec-item {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 12px; font-weight: 500;
+      color: var(--color-on-surface-variant);
+      flex: 1;
+    }
+    .spec-item svg { width: 14px; height: 14px; stroke: var(--color-on-surface-variant); fill: none; flex-shrink: 0; }
+    .spec-divider {
+      width: 1px; height: 14px;
+      background: var(--color-outline);
+      flex-shrink: 0;
+      margin: 0 2px;
+    }
+
+    .prop-card-footer {
+      display: flex; align-items: center;
+      justify-content: space-between;
+    }
+    .prop-card-sqm {
+      font-size: 12px; color: var(--color-on-surface-variant);
+    }
+    .prop-visning {
+      font-size: 12px; color: var(--color-on-surface-variant);
+      text-align: right;
+    }
+    .prop-visning span { color: var(--color-positive); font-weight: 600; }
+    .prop-visning span.grey { color: var(--color-on-surface-variant); }
+
+    /* ── Lagret (saved) view ── */
+    .lagret-view {
+      display: none;
+      flex: 1;
+      min-height: 0;          /* ← lar lagret-view krympe korrekt */
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .lagret-view.active { display: flex; }
+    .lagret-header {
+      padding: 10px var(--space-large) 6px;
+      font-size: 12px; font-weight: 600;
+      color: var(--color-on-surface-variant);
+      flex-shrink: 0;
+    }
+    .lagret-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 32px;
+      text-align: center;
+    }
+    .lagret-empty-icon {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--color-surface-container);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lagret-empty-icon svg { width: 28px; height: 28px; stroke: var(--color-on-surface-variant); fill: none; }
+    .lagret-empty-title { font-size: 16px; font-weight: 600; color: var(--color-on-surface); }
+    .lagret-empty-sub { font-size: 13px; color: var(--color-on-surface-variant); line-height: 1.5; }
+    .lagret-list {
+      flex: 1;
+      min-height: 0;          /* ← samme fix for lagret-listen */
+      overflow-y: auto;
+      padding: 0 var(--space-large) var(--space-large);
+      display: flex; flex-direction: column; gap: 12px;
+      scrollbar-width: none;
+    }
+    .lagret-list::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body>
+
+<div class="phone-shell">
+<div class="screens-wrapper" id="screensWrapper">
+
+<!-- ============================================================
+     SCREEN 1: BOLIGER TIL SALGS
+     ============================================================ -->
+<div class="screen" id="screenList">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-bar-time">9:41</span>
+    <div class="status-bar-icons">
+      <svg viewBox="0 0 24 24"><rect x="2" y="16" width="3" height="6" rx="1"/><rect x="7" y="12" width="3" height="10" rx="1"/><rect x="12" y="8" width="3" height="14" rx="1"/><rect x="17" y="4" width="3" height="18" rx="1" opacity="0.4"/></svg>
+      <svg viewBox="0 0 24 24" style="fill:none;stroke:var(--color-on-surface);stroke-width:2"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="var(--color-on-surface)"/></svg>
+      <svg viewBox="0 0 24 24" style="fill:none;stroke:var(--color-on-surface);stroke-width:1.5"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2" stroke-linecap="round"/><rect x="4" y="9" width="13" height="6" rx="1" fill="var(--color-on-surface)"/></svg>
+    </div>
+  </div>
+
+  <!-- List Header -->
+  <div class="list-header">
+    <div class="list-header-title">Boliger til salgs</div>
+    <div class="list-header-actions">
+      <button class="list-icon-btn">
+        <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <button class="list-icon-btn">
+        <svg viewBox="0 0 24 24" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="11" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Finansieringsbevis card -->
+  <div class="financing-card">
+    <div class="financing-top-row">
+      <span class="financing-label">Finansieringsbevis</span>
+      <span class="financing-bank">Bulder Bank</span>
+    </div>
+    <div class="financing-amount">5 000 000 kr</div>
+    <div class="financing-bottom-row">
+      <div class="financing-valid">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Gyldig til 16. juli 2026
+      </div>
+      <span class="financing-badge">Aktiv</span>
+    </div>
+  </div>
+
+  <!-- Filter chips -->
+  <div class="filter-row">
+    <button class="filter-chip active" onclick="filterType(this,'alle')">Alle typer</button>
+    <button class="filter-chip" onclick="filterType(this,'enebolig')">Enebolig</button>
+    <button class="filter-chip" onclick="filterType(this,'leilighet')">Leilighet</button>
+    <button class="filter-chip" onclick="filterType(this,'rekkehus')">Rekkehus</button>
+    <button class="filter-chip has-filter" onclick="openFilter()">
+      <svg viewBox="0 0 24 24" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+      Område · Rom
+    </button>
+  </div>
+
+  <!-- Legend -->
+  <div class="financing-legend">
+    <div class="legend-item"><span class="legend-dot ok"></span>Innenfor finansieringsbevis</div>
+    <div class="legend-item"><span class="legend-dot over"></span>Over beløpsgrense</div>
+  </div>
+
+  <!-- Result count -->
+  <div class="prop-count" id="propCount">8 boliger · Bergen og omegn</div>
+
+  <!-- ── ALL PROPERTIES VIEW ── -->
+  <div class="prop-list" id="propList">
+
+    <!-- 1. Nordnesgaten 42 · Leilighet · 4 900 000 ✓ -->
+    <div class="prop-card" data-id="1" data-type="leilighet" data-address="Nordnesgaten 42" data-area="Nordnes, Bergen" data-price="4 900 000 kr" data-m2="82" data-rooms="3" data-sqmprice="59 756" data-budget="ok" data-img="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=75" data-visning="Lør 11:00" data-visningstatus="green" onclick="openDetail(this)">
+      <img class="prop-card-img" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=75" alt="">
+      <div class="prop-card-img-overlay"></div>
+      <div class="prop-card-new">Ny</div>
+      <div class="prop-type-chip has-new">Leilighet</div>
+      <button class="prop-card-saved" data-id="1" onclick="toggleSave(event,this)">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <div class="prop-card-body">
+        <div class="prop-card-price-row">
+          <div class="prop-card-price">4 900 000 kr</div>
+          <span class="budget-badge ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Innenfor</span>
+        </div>
+        <div class="prop-card-address">Nordnesgaten 42</div>
+        <div class="prop-card-neighborhood">Nordnes · Bergen</div>
+        <div class="prop-card-specs">
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>3 rom</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>82 m²</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>3. etg</div>
+        </div>
+        <div class="prop-card-footer">
+          <div class="prop-card-sqm">59 756 kr/m²</div>
+          <div class="prop-visning">Visning <span>Lør 11:00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Jonsvollsgaten 2 · Leilighet · 4 200 000 ✓ -->
+    <div class="prop-card" data-id="2" data-type="leilighet" data-address="Jonsvollsgaten 2" data-area="Bergen sentrum" data-price="4 200 000 kr" data-m2="74" data-rooms="3" data-sqmprice="56 757" data-budget="ok" data-img="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=75" data-visning="Man 17:00" data-visningstatus="grey" onclick="openDetail(this)">
+      <img class="prop-card-img" src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=75" alt="">
+      <div class="prop-card-img-overlay"></div>
+      <div class="prop-type-chip">Leilighet</div>
+      <button class="prop-card-saved" data-id="2" onclick="toggleSave(event,this)">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <div class="prop-card-body">
+        <div class="prop-card-price-row">
+          <div class="prop-card-price">4 200 000 kr</div>
+          <span class="budget-badge ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Innenfor</span>
+        </div>
+        <div class="prop-card-address">Jonsvollsgaten 2</div>
+        <div class="prop-card-neighborhood">Bergen sentrum</div>
+        <div class="prop-card-specs">
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>3 rom</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>74 m²</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>2. etg</div>
+        </div>
+        <div class="prop-card-footer">
+          <div class="prop-card-sqm">56 757 kr/m²</div>
+          <div class="prop-visning">Visning <span class="grey">Man 17:00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Fløyfjellveien 88 · Enebolig · 5 800 000 ✗ -->
+    <div class="prop-card active-prop" data-id="3" data-type="enebolig" data-address="Fløyfjellveien 88" data-area="Fløen, Bergen" data-price="5 800 000 kr" data-m2="205" data-rooms="6" data-sqmprice="28 293" data-budget="over" data-img="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&q=75" data-visning="Lør 11:00" data-visningstatus="green" onclick="openDetail(this)">
+      <img class="prop-card-img" src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&q=75" alt="">
+      <div class="prop-card-img-overlay"></div>
+      <div class="prop-type-chip">Enebolig</div>
+      <button class="prop-card-saved saved" data-id="3" onclick="toggleSave(event,this)">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <div class="prop-card-body">
+        <div class="prop-card-price-row">
+          <div class="prop-card-price">5 800 000 kr</div>
+          <span class="budget-badge over"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Over grense</span>
+        </div>
+        <div class="prop-card-address">Fløyfjellveien 88</div>
+        <div class="prop-card-neighborhood">Fløen · Bergen</div>
+        <div class="prop-card-specs">
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>6 rom</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>205 m²</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Tomt 612 m²</div>
+        </div>
+        <div class="prop-card-footer">
+          <div class="prop-card-sqm">28 293 kr/m²</div>
+          <div class="prop-visning">Visning <span>Lør 11:00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Laksevågveien 101 · Leilighet · 3 900 000 ✓ -->
+    <div class="prop-card" data-id="4" data-type="leilighet" data-address="Laksevågveien 101" data-area="Laksevåg" data-price="3 900 000 kr" data-m2="58" data-rooms="2" data-sqmprice="67 241" data-budget="ok" data-img="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=75" data-visning="Søn 13:00" data-visningstatus="grey" onclick="openDetail(this)">
+      <img class="prop-card-img" src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=75" alt="">
+      <div class="prop-card-img-overlay"></div>
+      <div class="prop-card-new">Ny</div>
+      <div class="prop-type-chip has-new">Leilighet</div>
+      <button class="prop-card-saved" data-id="4" onclick="toggleSave(event,this)">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <div class="prop-card-body">
+        <div class="prop-card-price-row">
+          <div class="prop-card-price">3 900 000 kr</div>
+          <span class="budget-badge ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Innenfor</span>
+        </div>
+        <div class="prop-card-address">Laksevågveien 101</div>
+        <div class="prop-card-neighborhood">Laksevåg · Bergen</div>
+        <div class="prop-card-specs">
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>2 rom</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>58 m²</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>1. etg</div>
+        </div>
+        <div class="prop-card-footer">
+          <div class="prop-card-sqm">67 241 kr/m²</div>
+          <div class="prop-visning">Visning <span class="grey">Søn 13:00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Åsenvegen 45 · Rekkehus · 4 650 000 ✓ -->
+    <div class="prop-card" data-id="5" data-type="rekkehus" data-address="Åsenvegen 45" data-area="Åsane" data-price="4 650 000 kr" data-m2="128" data-rooms="4" data-sqmprice="36 328" data-budget="ok" data-img="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=75" data-visning="Man 18:00" data-visningstatus="grey" onclick="openDetail(this)">
+      <img class="prop-card-img" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=75" alt="">
+      <div class="prop-card-img-overlay"></div>
+      <div class="prop-type-chip">Rekkehus</div>
+      <button class="prop-card-saved" data-id="5" onclick="toggleSave(event,this)">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <div class="prop-card-body">
+        <div class="prop-card-price-row">
+          <div class="prop-card-price">4 650 000 kr</div>
+          <span class="budget-badge ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Innenfor</span>
+        </div>
+        <div class="prop-card-address">Åsenvegen 45</div>
+        <div class="prop-card-neighborhood">Åsane · Bergen</div>
+        <div class="prop-card-specs">
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>4 rom</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>128 m²</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Hage</div>
+        </div>
+        <div class="prop-card-footer">
+          <div class="prop-card-sqm">36 328 kr/m²</div>
+          <div class="prop-visning">Visning <span class="grey">Man 18:00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Bryggen 8 · Leilighet · 6 200 000 ✗ -->
+    <div class="prop-card" data-id="6" data-type="leilighet" data-address="Bryggen 8" data-area="Bergenhus" data-price="6 200 000 kr" data-m2="112" data-rooms="4" data-sqmprice="55 357" data-budget="over" data-img="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=75" data-visning="Lør 14:00" data-visningstatus="green" onclick="openDetail(this)">
+      <img class="prop-card-img" src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=75" alt="">
+      <div class="prop-card-img-overlay"></div>
+      <div class="prop-type-chip">Leilighet</div>
+      <button class="prop-card-saved" data-id="6" onclick="toggleSave(event,this)">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <div class="prop-card-body">
+        <div class="prop-card-price-row">
+          <div class="prop-card-price">6 200 000 kr</div>
+          <span class="budget-badge over"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Over grense</span>
+        </div>
+        <div class="prop-card-address">Bryggen 8</div>
+        <div class="prop-card-neighborhood">Bergenhus · Bergen</div>
+        <div class="prop-card-specs">
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>4 rom</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>112 m²</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>5. etg</div>
+        </div>
+        <div class="prop-card-footer">
+          <div class="prop-card-sqm">55 357 kr/m²</div>
+          <div class="prop-visning">Visning <span>Lør 14:00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Sandviksleitet 14 · Rekkehus · 5 200 000 ✗ -->
+    <div class="prop-card" data-id="7" data-type="rekkehus" data-address="Sandviksleitet 14" data-area="Sandviken" data-price="5 200 000 kr" data-m2="138" data-rooms="5" data-sqmprice="37 681" data-budget="over" data-img="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&q=75" data-visning="Tir 17:30" data-visningstatus="grey" onclick="openDetail(this)">
+      <img class="prop-card-img" src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&q=75" alt="">
+      <div class="prop-card-img-overlay"></div>
+      <div class="prop-type-chip">Rekkehus</div>
+      <button class="prop-card-saved" data-id="7" onclick="toggleSave(event,this)">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <div class="prop-card-body">
+        <div class="prop-card-price-row">
+          <div class="prop-card-price">5 200 000 kr</div>
+          <span class="budget-badge over"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Over grense</span>
+        </div>
+        <div class="prop-card-address">Sandviksleitet 14</div>
+        <div class="prop-card-neighborhood">Sandviken · Bergen</div>
+        <div class="prop-card-specs">
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>5 rom</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>138 m²</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Hage</div>
+        </div>
+        <div class="prop-card-footer">
+          <div class="prop-card-sqm">37 681 kr/m²</div>
+          <div class="prop-visning">Visning <span class="grey">Tir 17:30</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Mindemyren 23 · Leilighet · 3 600 000 ✓ -->
+    <div class="prop-card" data-id="8" data-type="leilighet" data-address="Mindemyren 23" data-area="Minde" data-price="3 600 000 kr" data-m2="65" data-rooms="2" data-sqmprice="55 384" data-budget="ok" data-img="https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=600&q=75" data-visning="Søn 11:00" data-visningstatus="grey" onclick="openDetail(this)">
+      <img class="prop-card-img" src="https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=600&q=75" alt="">
+      <div class="prop-card-img-overlay"></div>
+      <div class="prop-card-new">Ny</div>
+      <div class="prop-type-chip has-new">Leilighet</div>
+      <button class="prop-card-saved" data-id="8" onclick="toggleSave(event,this)">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <div class="prop-card-body">
+        <div class="prop-card-price-row">
+          <div class="prop-card-price">3 600 000 kr</div>
+          <span class="budget-badge ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Innenfor</span>
+        </div>
+        <div class="prop-card-address">Mindemyren 23</div>
+        <div class="prop-card-neighborhood">Minde · Bergen</div>
+        <div class="prop-card-specs">
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>2 rom</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>65 m²</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>4. etg</div>
+        </div>
+        <div class="prop-card-footer">
+          <div class="prop-card-sqm">55 384 kr/m²</div>
+          <div class="prop-visning">Visning <span class="grey">Søn 11:00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Bjørkåsen 20 · Enebolig · 5 000 000 ✓ -->
+    <div class="prop-card" data-id="9" data-type="enebolig" data-address="Bjørkåsen 20" data-area="Nesttun" data-price="5 000 000 kr" data-m2="144" data-rooms="5" data-sqmprice="34 722" data-budget="ok" data-img="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&q=75" data-visning="Man 17:00" data-visningstatus="green" onclick="openDetail(this)">
+      <img class="prop-card-img" src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&q=75" alt="">
+      <div class="prop-card-img-overlay"></div>
+      <div class="prop-type-chip">Enebolig</div>
+      <button class="prop-card-saved" data-id="9" onclick="toggleSave(event,this)">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <div class="prop-card-body">
+        <div class="prop-card-price-row">
+          <div class="prop-card-price">5 000 000 kr</div>
+          <span class="budget-badge ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Innenfor</span>
+        </div>
+        <div class="prop-card-address">Bjørkåsen 20</div>
+        <div class="prop-card-neighborhood">Nesttun · Bergen</div>
+        <div class="prop-card-specs">
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>5 rom</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>144 m²</div>
+          <div class="spec-divider"></div>
+          <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Enebolig</div>
+        </div>
+        <div class="prop-card-footer">
+          <div class="prop-card-sqm">34 722 kr/m²</div>
+          <div class="prop-visning">Visning <span class="green">Man 17:00</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /prop-list -->
+
+  <!-- ── LAGRET (SAVED) VIEW ── -->
+  <div class="lagret-view" id="lagretView">
+    <div class="lagret-header" id="lagretHeader">0 lagrede boliger</div>
+    <!-- Empty state -->
+    <div class="lagret-empty" id="lagretEmpty">
+      <div class="lagret-empty-icon">
+        <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <div class="lagret-empty-title">Ingen lagrede boliger</div>
+      <div class="lagret-empty-sub">Trykk på hjerteikonet på en bolig for å lagre den her</div>
+    </div>
+    <!-- Saved list (populated by JS) -->
+    <div class="lagret-list" id="lagretList"></div>
+  </div>
+
+  <!-- Bottom Nav (list screen) -->
+  <div class="bottom-nav" id="listBottomNav">
+    <div class="nav-item active" id="navBoliger" onclick="showListView()">
+      <div class="nav-icon"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <span class="nav-label">Boliger</span>
+    </div>
+    <div class="nav-item" onclick="showListView()">
+      <div class="nav-icon"><svg viewBox="0 0 24 24" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+      <span class="nav-label">AI Søk</span>
+    </div>
+    <div class="nav-item" id="navLagret" onclick="showLagretView()">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="nav-badge" id="savedBadge" style="display:none">0</span>
+      </div>
+      <span class="nav-label">Lagret</span>
+    </div>
+  </div>
+
+</div><!-- /screenList -->
+
+
+<!-- ============================================================
+     SCREEN 2: KJØPSASSISTENT DETAIL
+     ============================================================ -->
+<div class="screen" id="screenDetail">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-bar-time">9:41</span>
+    <div class="status-bar-icons">
+      <!-- Signal -->
+      <svg viewBox="0 0 24 24"><rect x="2" y="16" width="3" height="6" rx="1"/><rect x="7" y="12" width="3" height="10" rx="1"/><rect x="12" y="8" width="3" height="14" rx="1"/><rect x="17" y="4" width="3" height="18" rx="1" opacity="0.4"/></svg>
+      <!-- WiFi -->
+      <svg viewBox="0 0 24 24" style="fill:none;stroke:var(--color-on-surface);stroke-width:2"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="var(--color-on-surface)"/></svg>
+      <!-- Battery -->
+      <svg viewBox="0 0 24 24" style="fill:none;stroke:var(--color-on-surface);stroke-width:1.5"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2" stroke-linecap="round"/><rect x="4" y="9" width="13" height="6" rx="1" fill="var(--color-on-surface)"/></svg>
+    </div>
+  </div>
+
+  <!-- App Header -->
+  <div class="app-header">
+    <button class="header-back" onclick="goBack()">
+      <svg viewBox="0 0 24 24" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="header-title-block">
+      <div class="header-overline">Kjøpsassistent</div>
+      <div class="header-address">Fløyfjellveien 88, Bergen</div>
+    </div>
+    <div class="header-actions">
+      <button class="header-icon-btn">
+        <svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <button class="header-icon-btn">
+        <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Hero Image -->
+  <div class="hero">
+    <img id="heroImg" src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80" alt="Fløyfjellveien 88">
+    <div class="hero-gradient"></div>
+    <div class="hero-badge" id="heroBadge">Visning lørdag 11:00</div>
+    <div class="hero-price-block">
+      <div>
+        <div class="hero-price" id="heroPrice">5 800 000 kr</div>
+        <div class="hero-price-label">Prisantydning</div>
+      </div>
+      <div class="hero-photo-count" id="heroPhotoCount">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><polyline points="21 15 16 10 5 21"/></svg>
+        14 bilder
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-item active" onclick="switchTab('oversikt', this)">Oversikt</button>
+    <button class="tab-item" onclick="switchTab('nabolag', this)">Nabolag</button>
+    <button class="tab-item" onclick="switchTab('visning', this)">Visning</button>
+  </div>
+
+  <!-- Scrollable Content -->
+  <div class="content-scroll" id="mainScroll">
+
+    <!-- ===== TAB 1: OVERSIKT ===== -->
+    <div id="tab-oversikt" class="tab-content active">
+
+      <!-- Nøkkelinfo -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Nøkkelinfo</div>
+            <div class="card-subtitle">Alle fakta på ett sted</div>
+          </div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item wide">
+            <div class="info-label">Adresse</div>
+            <div class="info-value">Fløyfjellveien 88, 5018 Bergen</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Boligtype</div>
+            <div class="info-value">Enebolig</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Eierform</div>
+            <div class="info-value">Selveier</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Størrelse (BRA)</div>
+            <div class="info-value">205 m²</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Antall rom</div>
+            <div class="info-value">6 rom / 5 sov</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Byggeår</div>
+            <div class="info-value">1972</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Energimerke</div>
+            <div class="info-value" style="color:var(--color-warning)">C (Gul)</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Totalpris</div>
+            <div class="info-value green">6 027 500 kr</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Fellesgjeld</div>
+            <div class="info-value">Ingen</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Felleskostnader</div>
+            <div class="info-value">Ingen</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Det beste med boligen -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon green">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Det beste med boligen</div>
+            <div class="card-subtitle">Positive trekk fra annonsen</div>
+          </div>
+        </div>
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="feature-bullet"></div>
+            <div>
+              <div class="feature-text">Panoramautsikt over Bergen og fjorden fra stue og terrasse</div>
+              <div class="feature-sub">Sørvendt tomt — gode solforhold hele dagen</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-bullet"></div>
+            <div>
+              <div class="feature-text">Romslig enebolig på 205 m² med 5 soverom — passer godt for familie</div>
+              <div class="feature-sub">Dobbelt garasje og stor hage på 612 m²</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-bullet"></div>
+            <div>
+              <div class="feature-text">Totalrenovert kjøkken og to bad (2019) — oppgradert til moderne standard</div>
+              <div class="feature-sub">Flislagte bad med gulvvarme</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-bullet"></div>
+            <div>
+              <div class="feature-text">Stille og grønt nabolag — 8 min gange til Byparken og buss</div>
+              <div class="feature-sub">Bergensdalen skole og barnehage i nærområdet</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-bullet"></div>
+            <div>
+              <div class="feature-text">Utleiedel i underetasjen med egen inngang og kjøkken</div>
+              <div class="feature-sub">Potensiell leieinntekt: ca. 12 000 kr/mnd</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Obs-punkter -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon yellow">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Dette bør du være obs på</div>
+            <div class="card-subtitle">Funn fra tilstandsrapporten</div>
+          </div>
+        </div>
+        <div class="tg-list">
+          <div class="tg-item">
+            <span class="tg-badge tg2">TG2</span>
+            <div class="tg-content">
+              <div class="tg-title">Bad – tettesjikt og membran</div>
+              <div class="tg-desc">Begge bad er renovert i 2019, men tettesjikt nærmer seg 10-årsgrensen. Bør sjekkes av fagperson — en lekkasje kan gi store skader.</div>
+            </div>
+          </div>
+          <div class="tg-item">
+            <span class="tg-badge tg2">TG2</span>
+            <div class="tg-content">
+              <div class="tg-title">Drenering rundt grunnmur</div>
+              <div class="tg-desc">Dreneringen er fra byggeåret (1972) og aldri skiftet. Høy risiko for fuktinnsig over tid. Utskiftning koster typisk 150 000–300 000 kr.</div>
+            </div>
+          </div>
+          <div class="tg-item">
+            <span class="tg-badge tg2">TG2</span>
+            <div class="tg-content">
+              <div class="tg-title">Varmtvannsbereder – alder</div>
+              <div class="tg-desc">Berederen er fra 2007 (17 år). Forventet levetid er 15–20 år. Bør beregnes skiftet innen kort tid — kostnad ca. 10 000–15 000 kr.</div>
+            </div>
+          </div>
+          <div class="tg-item">
+            <span class="tg-badge tg2">TG2</span>
+            <div class="tg-content">
+              <div class="tg-title">Vinduer – kondens mellom glass</div>
+              <div class="tg-desc">3 vinduer har brutt forseglingen som gir dogg/kondens innvendig. Redusert isolasjonsevne. Utskiftning per vindu: ca. 3 000–8 000 kr.</div>
+            </div>
+          </div>
+          <div class="tg-item">
+            <span class="tg-badge tg1">TG1</span>
+            <div class="tg-content">
+              <div class="tg-title">El-anlegg – eldre samsvarserklæring</div>
+              <div class="tg-desc">Samsvarserklæring foreligger, men er fra 2008. Anlegget fungerer, men bør få en ny el-kontroll ved eierskifte for å avdekke evt. avvik.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Økonomi-oversikt -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon purple">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Økonomi-oversikt</div>
+            <div class="card-subtitle">Totalbeløp og månedskostnader</div>
+          </div>
+        </div>
+
+        <div class="econ-rows">
+          <div class="econ-row">
+            <span class="econ-label">Prisantydning</span>
+            <span class="econ-value">5 800 000 kr</span>
+          </div>
+          <div class="econ-row">
+            <span class="econ-label">Fellesgjeld</span>
+            <span class="econ-value">0 kr</span>
+          </div>
+          <div class="econ-row">
+            <span class="econ-label">Dokumentavgift (2,5 %)</span>
+            <span class="econ-value">145 000 kr</span>
+          </div>
+          <div class="econ-row">
+            <span class="econ-label">Tinglysing / omkostninger</span>
+            <span class="econ-value">7 958 kr</span>
+          </div>
+          <div class="econ-row">
+            <span class="econ-label">Meglersalær (est.)</span>
+            <span class="econ-value">74 542 kr</span>
+          </div>
+          <div class="econ-row total">
+            <span class="econ-label">Estimert totalkostnad</span>
+            <span class="econ-value">6 027 500 kr</span>
+          </div>
+        </div>
+
+        <div class="monthly-block">
+          <div class="monthly-title">Estimerte månedskostnader</div>
+          <div class="monthly-total">ca. 31 700 kr/mnd</div>
+          <div class="monthly-sub">Med 20% egenkapital · 5% rente · 25 år nedbet.</div>
+          <div class="monthly-breakdown">
+            <div class="monthly-row"><span>Renter (5 %)</span><span>19 333 kr</span></div>
+            <div class="monthly-row"><span>Avdrag</span><span>7 680 kr</span></div>
+            <div class="monthly-row"><span>Strøm (est. 205 m²)</span><span>3 100 kr</span></div>
+            <div class="monthly-row"><span>Kommunale avgifter</span><span>1 100 kr</span></div>
+            <div class="monthly-row"><span>Forsikring</span><span>490 kr</span></div>
+            <div class="monthly-row" style="margin-top:4px;padding-top:6px;border-top:1px solid var(--color-outline)">
+              <span style="color:var(--color-positive);font-weight:600">–Leieinntekt (utleiedel)</span>
+              <span style="color:var(--color-positive);font-weight:600">–12 000 kr</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tab-oversikt -->
+
+
+    <!-- ===== TAB 2: NABOLAG ===== -->
+    <div id="tab-nabolag" class="tab-content">
+
+      <!-- Mini Map -->
+      <div class="card" style="padding: var(--space-large)">
+        <div class="card-header">
+          <div class="card-icon blue">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Fløen, Bergen</div>
+            <div class="card-subtitle">Kart og solgte boliger i nærområdet</div>
+          </div>
+        </div>
+
+        <!-- SVG map -->
+        <div class="map-container">
+          <svg class="map-svg" viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background streets -->
+            <rect width="340" height="160" fill="#1a2440"/>
+            <!-- Main roads -->
+            <path d="M0 80 Q85 75 170 80 Q255 85 340 80" stroke="#262f47" stroke-width="12" fill="none"/>
+            <path d="M170 0 Q168 40 170 80 Q172 120 170 160" stroke="#262f47" stroke-width="10" fill="none"/>
+            <path d="M0 40 Q80 38 160 42 Q240 46 340 38" stroke="#1e2a45" stroke-width="7" fill="none"/>
+            <path d="M0 120 Q100 118 200 122 Q270 124 340 118" stroke="#1e2a45" stroke-width="7" fill="none"/>
+            <path d="M50 0 Q48 55 52 160" stroke="#1e2a45" stroke-width="5" fill="none"/>
+            <path d="M290 0 Q288 55 292 160" stroke="#1e2a45" stroke-width="5" fill="none"/>
+            <!-- Road labels -->
+            <text x="170" y="73" fill="#3e4965" font-size="7" font-family="system-ui" text-anchor="middle">Fløyfjellveien</text>
+            <!-- Parks -->
+            <rect x="200" y="95" width="50" height="35" rx="4" fill="#1f3020" opacity="0.7"/>
+            <rect x="20" y="20" width="25" height="20" rx="3" fill="#1f3020" opacity="0.6"/>
+            <!-- Buildings -->
+            <rect x="65" y="48" width="18" height="14" rx="2" fill="#262f47"/>
+            <rect x="90" y="50" width="22" height="12" rx="2" fill="#262f47"/>
+            <rect x="200" y="45" width="28" height="16" rx="2" fill="#262f47"/>
+            <rect x="240" y="50" width="20" height="12" rx="2" fill="#262f47"/>
+            <rect x="65" y="95" width="30" height="16" rx="2" fill="#262f47"/>
+            <rect x="240" y="93" width="25" height="18" rx="2" fill="#262f47"/>
+            <!-- Sold property dots -->
+            <circle cx="90" cy="58" r="5" fill="#85ff86" opacity="0.9"/>
+            <circle cx="218" cy="52" r="5" fill="#85ff86" opacity="0.9"/>
+            <circle cx="75" cy="104" r="5" fill="#85ff86" opacity="0.9"/>
+            <circle cx="254" cy="100" r="5" fill="#85ff86" opacity="0.9"/>
+            <circle cx="130" cy="35" r="5" fill="#85ff86" opacity="0.9"/>
+            <circle cx="280" cy="60" r="5" fill="#85ff86" opacity="0.9"/>
+            <!-- Bus stop icon -->
+            <rect x="148" y="90" width="18" height="12" rx="2" fill="#3063ff" opacity="0.8"/>
+            <text x="157" y="99" fill="white" font-size="7" font-family="system-ui" text-anchor="middle" font-weight="bold">B</text>
+          </svg>
+          <!-- Home pin -->
+          <div class="map-pin-home">
+            <div class="map-pin-label">Din bolig</div>
+            <div class="map-pin-dot"></div>
+          </div>
+          <!-- Legend -->
+          <div class="map-overlay-badge">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="var(--color-secondary)"/></svg>
+            Solgt i nabolaget
+          </div>
+        </div>
+
+        <!-- Price stats -->
+        <div class="price-stats-row">
+          <div class="price-stat-item">
+            <div class="price-stat-value">51 200</div>
+            <div class="price-stat-label">Kr/m² snitt</div>
+            <div class="price-stat-change up">▲ 3,2 %</div>
+          </div>
+          <div class="price-stat-item">
+            <div class="price-stat-value">18</div>
+            <div class="price-stat-label">Solgt siste år</div>
+            <div class="price-stat-change up">▲ aktiv marked</div>
+          </div>
+          <div class="price-stat-item">
+            <div class="price-stat-value">24 d</div>
+            <div class="price-stat-label">Snitt liggetid</div>
+            <div class="price-stat-change down">▼ 6 d raskere</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prisutvikling sparkline -->
+      <div class="card" style="padding: var(--space-large)">
+        <div class="sparkline-wrap" style="margin-bottom: 0; background: transparent; padding: 0;">
+          <div class="sparkline-header">
+            <div>
+              <div class="sparkline-title">Prisutvikling — Fløen</div>
+              <div class="sparkline-subtitle">Gjennomsnittspris enebolig · kr/m²</div>
+            </div>
+            <div class="sparkline-period-pills">
+              <button class="period-pill" onclick="setPeriod(this, '1y')">1 år</button>
+              <button class="period-pill active" onclick="setPeriod(this, '3y')">3 år</button>
+              <button class="period-pill" onclick="setPeriod(this, '5y')">5 år</button>
+            </div>
+          </div>
+          <svg class="sparkline-svg" viewBox="0 0 310 70" xmlns="http://www.w3.org/2000/svg" style="margin-top:12px">
+            <defs>
+              <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#3063ff" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#3063ff" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="0" y1="10" x2="310" y2="10" stroke="#262f47" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="0" y1="35" x2="310" y2="35" stroke="#262f47" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="0" y1="60" x2="310" y2="60" stroke="#262f47" stroke-width="1" stroke-dasharray="4,4"/>
+            <!-- Area fill -->
+            <path d="M0 55 L45 50 L90 48 L135 42 L180 38 L225 28 L270 20 L310 14 L310 70 L0 70 Z" fill="url(#sparkGrad)"/>
+            <!-- Line -->
+            <path d="M0 55 L45 50 L90 48 L135 42 L180 38 L225 28 L270 20 L310 14" stroke="#3063ff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Current point -->
+            <circle cx="310" cy="14" r="4" fill="#3063ff"/>
+            <circle cx="310" cy="14" r="7" fill="#3063ff" opacity="0.2"/>
+            <!-- Y labels -->
+            <text x="0" y="9" fill="#4c5674" font-size="8" font-family="system-ui">55k</text>
+            <text x="0" y="34" fill="#4c5674" font-size="8" font-family="system-ui">48k</text>
+            <text x="0" y="59" fill="#4c5674" font-size="8" font-family="system-ui">41k</text>
+          </svg>
+          <div class="sparkline-x-labels">
+            <span class="sparkline-x-label">Apr 23</span>
+            <span class="sparkline-x-label">Okt 23</span>
+            <span class="sparkline-x-label">Apr 24</span>
+            <span class="sparkline-x-label">Okt 24</span>
+            <span class="sparkline-x-label">Apr 25</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solgte i nabolaget -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon green">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Solgt i nabolaget</div>
+            <div class="card-subtitle">Siste 12 måneder · sammenlignbare boliger</div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div class="sold-card">
+            <img class="sold-card-thumb" src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=120&q=70" alt="Jonsvollsgaten">
+            <div class="sold-card-info">
+              <div class="sold-card-address">Jonsvollsgaten 12</div>
+              <div class="sold-card-meta">Enebolig · 188 m² · 5 rom</div>
+            </div>
+            <div class="sold-card-right">
+              <div class="sold-card-price">5 450 000</div>
+              <div class="sold-card-sqm">48 780 kr/m²</div>
+              <div class="sold-card-date">Solgt 14. feb</div>
+            </div>
+          </div>
+          <div class="sold-card">
+            <img class="sold-card-thumb" src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=120&q=70" alt="Mindemyren">
+            <div class="sold-card-info">
+              <div class="sold-card-address">Fjelltunveien 3</div>
+              <div class="sold-card-meta">Enebolig · 220 m² · 6 rom</div>
+            </div>
+            <div class="sold-card-right">
+              <div class="sold-card-price">6 200 000</div>
+              <div class="sold-card-sqm">51 250 kr/m²</div>
+              <div class="sold-card-date">Solgt 3. jan</div>
+            </div>
+          </div>
+          <div class="sold-card">
+            <img class="sold-card-thumb" src="https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=120&q=70" alt="Åsenvegen">
+            <div class="sold-card-info">
+              <div class="sold-card-address">Høyden allé 7</div>
+              <div class="sold-card-meta">Enebolig · 175 m² · 5 rom</div>
+            </div>
+            <div class="sold-card-right">
+              <div class="sold-card-price">5 100 000</div>
+              <div class="sold-card-sqm">49 600 kr/m²</div>
+              <div class="sold-card-date">Solgt 28. okt</div>
+            </div>
+          </div>
+        </div>
+        <button style="width:100%;margin-top:12px;padding:10px;border-radius:var(--radius-standard);background:var(--color-surface-container-high);border:none;color:var(--color-primary);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;letter-spacing:0.03em;">
+          Se alle 18 solgte boliger →
+        </button>
+      </div>
+
+      <!-- Sol og støy -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon yellow">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Sol- og støyforhold</div>
+            <div class="card-subtitle">Basert på karttjeneste og veidata</div>
+          </div>
+        </div>
+        <div class="condition-row">
+          <div class="condition-item">
+            <div class="condition-header">
+              <svg viewBox="0 0 24 24" stroke="var(--color-warning)" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+              Solforhold
+            </div>
+            <div class="condition-value">Svært bra</div>
+            <div class="condition-bar-track">
+              <div class="condition-bar-fill green" style="width: 85%"></div>
+            </div>
+            <div style="font-size:11px;color:var(--color-on-surface-variant)">Sørvendt tomt · 6+ t/dag</div>
+          </div>
+          <div class="condition-item">
+            <div class="condition-header">
+              <svg viewBox="0 0 24 24" stroke="var(--color-primary)" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+              Støynivå
+            </div>
+            <div class="condition-value">Lavt</div>
+            <div class="condition-bar-track">
+              <div class="condition-bar-fill green" style="width: 22%"></div>
+            </div>
+            <div style="font-size:11px;color:var(--color-on-surface-variant)">Rolig sidegate · &lt;35 dB</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fasiliteter -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 1 8 8c0 5.4-7.1 12.3-7.7 12.8a.5.5 0 0 1-.6 0C11.1 22.3 4 15.4 4 10a8 8 0 0 1 8-8z"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Fasiliteter i nærheten</div>
+            <div class="card-subtitle">Gangavstand fra boligen</div>
+          </div>
+        </div>
+        <div class="facility-list">
+          <!-- Transport -->
+          <div class="facility-item">
+            <div class="facility-icon transport">
+              <svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <div>
+              <div class="facility-name">Buss linje 2 — Fløen</div>
+              <div class="facility-sub">Direkte til sentrum · 8 min</div>
+            </div>
+            <div class="facility-dist">
+              <div class="facility-dist-val">200 m</div>
+              <div class="facility-dist-walk">3 min gange</div>
+            </div>
+          </div>
+          <div class="facility-item">
+            <div class="facility-icon transport">
+              <svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+            </div>
+            <div>
+              <div class="facility-name">Bybanen — Fløen stoppested</div>
+              <div class="facility-sub">Mot Bergen sentrum og Flesland</div>
+            </div>
+            <div class="facility-dist">
+              <div class="facility-dist-val">400 m</div>
+              <div class="facility-dist-walk">5 min gange</div>
+            </div>
+          </div>
+          <!-- Dagligvare -->
+          <div class="facility-item">
+            <div class="facility-icon shop">
+              <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            </div>
+            <div>
+              <div class="facility-name">Kiwi Vaskerelven</div>
+              <div class="facility-sub">Dagligvare</div>
+            </div>
+            <div class="facility-dist">
+              <div class="facility-dist-val">700 m</div>
+              <div class="facility-dist-walk">9 min gange</div>
+            </div>
+          </div>
+          <div class="facility-item">
+            <div class="facility-icon shop">
+              <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            </div>
+            <div>
+              <div class="facility-name">Rema 1000 Minde</div>
+              <div class="facility-sub">Dagligvare</div>
+            </div>
+            <div class="facility-dist">
+              <div class="facility-dist-val">1,1 km</div>
+              <div class="facility-dist-walk">14 min gange</div>
+            </div>
+          </div>
+          <!-- Helse -->
+          <div class="facility-item">
+            <div class="facility-icon health">
+              <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <div>
+              <div class="facility-name">Fløen legesenter</div>
+              <div class="facility-sub">Fastlege og legevakt</div>
+            </div>
+            <div class="facility-dist">
+              <div class="facility-dist-val">550 m</div>
+              <div class="facility-dist-walk">7 min gange</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skoler -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon school" style="background:rgba(250,232,78,0.15)">
+            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke="var(--color-warning)" fill="none"><path d="M2 20h20M4 20V10l8-7 8 7v10M9 20v-5h6v5"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Skoler i nærområdet</div>
+            <div class="card-subtitle">Barneskole, ungdomsskole og videregående</div>
+          </div>
+        </div>
+        <div class="facility-list">
+          <div class="facility-item">
+            <div class="facility-icon school">
+              <svg viewBox="0 0 24 24" stroke-width="1.8" stroke="var(--color-warning)" fill="none"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <div>
+              <div class="facility-name">Bergensdalen skole</div>
+              <div class="facility-sub" style="margin-bottom:3px">Barneskole (1–7. trinn)</div>
+              <div class="school-rating">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star empty">★</span>
+                <span style="font-size:10px;color:var(--color-on-surface-variant);margin-left:3px">4,1</span>
+              </div>
+            </div>
+            <div class="facility-dist">
+              <div class="facility-dist-val">800 m</div>
+              <div class="facility-dist-walk">10 min gange</div>
+            </div>
+          </div>
+          <div class="facility-item">
+            <div class="facility-icon school">
+              <svg viewBox="0 0 24 24" stroke-width="1.8" stroke="var(--color-warning)" fill="none"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <div>
+              <div class="facility-name">Møhlenpris skole</div>
+              <div class="facility-sub" style="margin-bottom:3px">Barneskole (1–7. trinn)</div>
+              <div class="school-rating">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span>
+                <span style="font-size:10px;color:var(--color-on-surface-variant);margin-left:3px">4,6</span>
+              </div>
+            </div>
+            <div class="facility-dist">
+              <div class="facility-dist-val">1,2 km</div>
+              <div class="facility-dist-walk">15 min gange</div>
+            </div>
+          </div>
+          <div class="facility-item">
+            <div class="facility-icon school">
+              <svg viewBox="0 0 24 24" stroke-width="1.8" stroke="var(--color-warning)" fill="none"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div>
+              <div class="facility-name">Tanks ungdomsskole</div>
+              <div class="facility-sub" style="margin-bottom:3px">Ungdomsskole (8–10. trinn)</div>
+              <div class="school-rating">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star empty">★</span>
+                <span style="font-size:10px;color:var(--color-on-surface-variant);margin-left:3px">3,9</span>
+              </div>
+            </div>
+            <div class="facility-dist">
+              <div class="facility-dist-val">1,5 km</div>
+              <div class="facility-dist-walk">19 min gange</div>
+            </div>
+          </div>
+          <div class="facility-item">
+            <div class="facility-icon school">
+              <svg viewBox="0 0 24 24" stroke-width="1.8" stroke="var(--color-warning)" fill="none"><path d="M2 20h20M4 20V10l8-7 8 7v10M9 20v-5h6v5"/></svg>
+            </div>
+            <div>
+              <div class="facility-name">Bergen Katedralskole</div>
+              <div class="facility-sub" style="margin-bottom:3px">Videregående (Vg1–3)</div>
+              <div class="school-rating">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span>
+                <span style="font-size:10px;color:var(--color-on-surface-variant);margin-left:3px">4,8</span>
+              </div>
+            </div>
+            <div class="facility-dist">
+              <div class="facility-dist-val">1,8 km</div>
+              <div class="facility-dist-walk">23 min gange</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nabolagsprofil / Demografi -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Nabolagsprofil</div>
+            <div class="card-subtitle">Befolkning og livsstil · SSB-data</div>
+          </div>
+        </div>
+        <div class="demo-grid">
+          <div class="demo-item">
+            <div class="demo-icon">👨‍👩‍👧‍👦</div>
+            <div class="demo-value">42 %</div>
+            <div class="demo-label">Barnefamilier</div>
+          </div>
+          <div class="demo-item">
+            <div class="demo-icon">🎂</div>
+            <div class="demo-value">37 år</div>
+            <div class="demo-label">Gjennomsnittsalder</div>
+          </div>
+          <div class="demo-item">
+            <div class="demo-icon">💰</div>
+            <div class="demo-value">698 k</div>
+            <div class="demo-label">Sn.inntekt / år</div>
+          </div>
+          <div class="demo-item">
+            <div class="demo-icon">🏘️</div>
+            <div class="demo-value">78 %</div>
+            <div class="demo-label">Selveiere</div>
+          </div>
+        </div>
+
+        <!-- Nabolagsfølelse tags -->
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--space-large)">
+          <span style="background:rgba(48,99,255,0.15);color:var(--color-primary);font-size:12px;font-weight:600;padding:4px 10px;border-radius:100px;">🌳 Grønt og rolig</span>
+          <span style="background:rgba(97,213,98,0.12);color:var(--color-positive);font-size:12px;font-weight:600;padding:4px 10px;border-radius:100px;">🚶 Svært gangvennlig</span>
+          <span style="background:rgba(250,232,78,0.15);color:var(--color-warning);font-size:12px;font-weight:600;padding:4px 10px;border-radius:100px;">☀️ Mye sol</span>
+          <span style="background:rgba(48,99,255,0.15);color:var(--color-primary);font-size:12px;font-weight:600;padding:4px 10px;border-radius:100px;">🚌 Godt kollektivt</span>
+          <span style="background:rgba(147,97,248,0.15);color:#9361f8;font-size:12px;font-weight:600;padding:4px 10px;border-radius:100px;">🏫 Gode skoler</span>
+        </div>
+      </div>
+
+    </div><!-- /tab-nabolag -->
+
+
+    <!-- ===== TAB 3: VISNING ===== -->
+    <div id="tab-visning" class="tab-content">
+
+      <!-- Visning chip -->
+      <div class="visning-chip">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Visning lørdag 19. april kl. 11:00
+      </div>
+
+      <!-- Sjekkliste -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon green">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Sjekkliste for visningen</div>
+            <div class="card-subtitle">Basert på tilstandsrapport og boligens alder</div>
+          </div>
+        </div>
+
+        <div class="progress-row">
+          <span class="progress-label">Fullførte punkter</span>
+          <span class="progress-count" id="checkCount">0 / 10</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+
+        <div class="checklist" id="checklist">
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div>
+              <div class="check-text">Sjekk lukt og fukt i underetasjen og kjeller — eldre drenering fra 1972</div>
+              <div class="check-priority high">⚠ Høy prioritet</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div>
+              <div class="check-text">Ta med lommelykt — undersøk grunnmur for sprekker, saltutslag og fuktmerker</div>
+              <div class="check-priority high">⚠ Høy prioritet</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div>
+              <div class="check-text">Test ventilasjonen på begge bad — kjenn etter trekk fra ventil</div>
+              <div class="check-priority medium">◆ Middels prioritet</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div>
+              <div class="check-text">Sjekk alle vinduer — se etter de 3 vinduene med kondens mellom glass</div>
+              <div class="check-priority medium">◆ Middels prioritet</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div>
+              <div class="check-text">Finn varmtvannsberederen og noter årstall — den er fra 2007</div>
+              <div class="check-priority medium">◆ Middels prioritet</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div>
+              <div class="check-text">Observer solforholdene på terrassen — visningen er kl. 11:00 (sørvendt)</div>
+              <div class="check-priority low">✓ Bonus-punkt</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div>
+              <div class="check-text">Sjekk el-tavlen — noter alder og om det er sikringer eller automatsikringer</div>
+              <div class="check-priority medium">◆ Middels prioritet</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div>
+              <div class="check-text">Gå gjennom utleiedelen separat — vurder standard og leieinntekets-potensial</div>
+              <div class="check-priority low">✓ Bonus-punkt</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div>
+              <div class="check-text">Sjekk garasjen — se etter oljeflekker (lekkasje) og vurder stand på porter</div>
+              <div class="check-priority low">✓ Bonus-punkt</div>
+            </div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div>
+              <div class="check-text">Mål romstørrelser i de viktigste rommene — ta med målebånd eller bruk appen</div>
+              <div class="check-priority low">✓ Bonus-punkt</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /checklist card -->
+
+
+      <!-- Spørsmål til megler -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Spørsmål til megler</div>
+            <div class="card-subtitle">12 konkrete spørsmål — klar til visning</div>
+          </div>
+        </div>
+
+        <!-- Agent card -->
+        <div class="agent-card">
+          <div class="agent-avatar">KN</div>
+          <div class="agent-info">
+            <div class="agent-name">Kristin Nygård</div>
+            <div class="agent-company">Privatmegleren Bergen</div>
+          </div>
+          <div class="agent-actions">
+            <button class="agent-btn" title="Ring">
+              <svg viewBox="0 0 24 24" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.41 2 2 0 0 1 3.59 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l1.16-1.16a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </button>
+            <button class="agent-btn" style="background:var(--color-surface-container-high)" title="Melding">
+              <svg viewBox="0 0 24 24" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Byggteknisk -->
+        <div class="q-category">
+          <div class="q-category-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" stroke="var(--color-warning)" fill="none" stroke-width="2"><path d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4"/></svg>
+            <span class="q-category-label">Byggteknisk</span>
+          </div>
+          <div class="q-list">
+            <div class="q-item">
+              <div class="q-num">1</div>
+              <div class="q-text">Dreneringen er original fra 1972 — er det gjort noen utbedringer eller undersøkelser av grunnmuren?</div>
+              <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            </div>
+            <div class="q-item">
+              <div class="q-num">2</div>
+              <div class="q-text">Hvilken leverandør utførte baderomsrenovasjonen i 2019 — finnes det dokumentasjon og garantier på arbeidet?</div>
+              <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            </div>
+            <div class="q-item">
+              <div class="q-num">3</div>
+              <div class="q-text">Er det gjort en ny el-kontroll etter 2008-samsvarserklæringen — og er det planer om dette ved eierskifte?</div>
+              <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            </div>
+            <div class="q-item">
+              <div class="q-num">4</div>
+              <div class="q-text">Vet selger om årsaken til kondens i de tre vinduene — er det aktuelt med prisavslag?</div>
+              <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- Beliggenhet -->
+        <div class="q-category" style="margin-top: var(--space-large)">
+          <div class="q-category-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" stroke="var(--color-primary)" fill="none" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 1 8 8c0 5.4-7.1 12.3-7.7 12.8a.5.5 0 0 1-.6 0C11.1 22.3 4 15.4 4 10a8 8 0 0 1 8-8z"/></svg>
+            <span class="q-category-label">Beliggenhet og nabolag</span>
+          </div>
+          <div class="q-list">
+            <div class="q-item">
+              <div class="q-num">5</div>
+              <div class="q-text">Er det planlagte reguleringsendringer eller utbyggingsprosjekter i nærområdet som kan påvirke utsikten?</div>
+              <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            </div>
+            <div class="q-item">
+              <div class="q-num">6</div>
+              <div class="q-text">Hvordan er støynivået fra veien — er det mye trafikk i rushtiden, spesielt om morgenen?</div>
+              <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            </div>
+            <div class="q-item">
+              <div class="q-num">7</div>
+              <div class="q-text">Finnes det parkeringsproblemer i gata eller begrensninger på bruken av innkjørselen?</div>
+              <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            </div>
+            <div class="q-item">
+              <div class="q-num">8</div>
+              <div class="q-text">Hva er grunnen til at selger selger — og hvor lenge har de bodd her?</div>
+              <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-sep"></div>
+
+        <!-- Praktisk / juridisk -->
+        <div class="q-category" style="margin-top: var(--space-large)">
+          <div class="q-category-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" stroke="var(--color-positive)" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span class="q-category-label">Praktisk og juridisk</span>
+          </div>
+          <div class="q-list">
+            <div class="q-item">
+              <div class="q-num">9</div>
+              <div class="q-text">Foreligger det ferdigattest for boligen og eventuelle tilbygg — inkludert garasjen og utleiedelen?</div>
+              <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            </div>
+            <div class="q-item">
+              <div class="q-num">10</div>
+              <div class="q-text">Hva følger med i kjøpet — er hvitevarene, lamper, utemøbler og garasjeportåpnere inkludert?</div>
+              <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            </div>
+            <div class="q-item">
+              <div class="q-num">11</div>
+              <div class="q-text">Er det tinglyst noen servitutter, bruksretter eller heftelser på eiendommen?</div>
+              <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            </div>
+            <div class="q-item">
+              <div class="q-num">12</div>
+              <div class="q-text">Forventer megler mange budgivere — og hva er selgers ønskede overtakelsesdato?</div>
+              <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /spørsmål card -->
+
+    </div><!-- /tab-visning -->
+
+  </div><!-- /content-scroll -->
+
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <span class="nav-label">Boliger</span>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      </div>
+      <span class="nav-label">AI Søk</span>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="nav-badge">2</span>
+      </div>
+      <span class="nav-label">Lagret</span>
+    </div>
+  </div>
+
+</div><!-- /screenDetail -->
+</div><!-- /screensWrapper -->
+</div><!-- /phone-shell -->
+
+
+<script>
+  // ── Saved properties state ─────────────────────────────────
+  const saved = new Set(['3']); // Fløyfjellveien pre-saved
+
+  function toggleSave(e, btn) {
+    e.stopPropagation();
+    const id = btn.dataset.id;
+    if (saved.has(id)) {
+      saved.delete(id);
+      btn.classList.remove('saved');
+    } else {
+      saved.add(id);
+      btn.classList.add('saved');
+      // heart pop animation
+      btn.style.transform = 'scale(1.3)';
+      setTimeout(() => btn.style.transform = '', 200);
+    }
+    // sync all buttons with same id
+    document.querySelectorAll(`.prop-card-saved[data-id="${id}"]`).forEach(b => {
+      saved.has(id) ? b.classList.add('saved') : b.classList.remove('saved');
+    });
+    updateSavedBadge();
+    if (document.getElementById('lagretView').classList.contains('active')) renderLagretList();
+  }
+
+  function updateSavedBadge() {
+    const badge = document.getElementById('savedBadge');
+    const count = saved.size;
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+  }
+
+  function renderLagretList() {
+    const list = document.getElementById('lagretList');
+    const empty = document.getElementById('lagretEmpty');
+    const header = document.getElementById('lagretHeader');
+    list.innerHTML = '';
+    if (saved.size === 0) {
+      empty.style.display = 'flex';
+      list.style.display = 'none';
+      header.textContent = '0 lagrede boliger';
+      return;
+    }
+    empty.style.display = 'none';
+    list.style.display = 'flex';
+    header.textContent = saved.size + ' lagret bolig' + (saved.size !== 1 ? 'er' : '');
+
+    document.querySelectorAll('#propList .prop-card').forEach(card => {
+      if (!saved.has(card.dataset.id)) return;
+      const d = card.dataset;
+      const budgeClass = d.budget === 'ok' ? 'ok' : 'over';
+      const budgeTxt  = d.budget === 'ok' ? '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Innenfor' : '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Over grense';
+      const visnCol   = d.visningstatus === 'green' ? '' : 'class="grey"';
+      const typeLabel = d.type.charAt(0).toUpperCase() + d.type.slice(1);
+      const node = document.createElement('div');
+      node.className = 'prop-card';
+      node.dataset.id = d.id;
+      node.onclick = () => openDetailFromCard(card);
+      node.innerHTML = `
+        <img class="prop-card-img" src="${d.img}" alt="">
+        <div class="prop-card-img-overlay"></div>
+        <div class="prop-type-chip">${typeLabel}</div>
+        <button class="prop-card-saved saved" data-id="${d.id}" onclick="toggleSave(event,this)">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <div class="prop-card-body">
+          <div class="prop-card-price-row">
+            <div class="prop-card-price">${d.price}</div>
+            <span class="budget-badge ${budgeClass}">${budgeTxt}</span>
+          </div>
+          <div class="prop-card-address">${d.address}</div>
+          <div class="prop-card-neighborhood">${d.area}</div>
+          <div class="prop-card-specs">
+            <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>${d.rooms} rom</div>
+            <div class="spec-divider"></div>
+            <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>${d.m2} m²</div>
+            <div class="spec-divider"></div>
+            <div class="spec-item"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>${typeLabel}</div>
+          </div>
+          <div class="prop-card-footer">
+            <div class="prop-card-sqm">${d.sqmprice} kr/m²</div>
+            <div class="prop-visning">Visning <span ${visnCol}>${d.visning}</span></div>
+          </div>
+        </div>`;
+      list.appendChild(node);
+    });
+  }
+
+  // ── List / Lagret view toggle ──────────────────────────────
+  function showListView() {
+    document.getElementById('propList').style.display    = 'flex';
+    document.getElementById('propCount').style.display  = 'block';
+    document.getElementById('lagretView').classList.remove('active');
+    document.querySelectorAll('#listBottomNav .nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('navBoliger').classList.add('active');
+  }
+
+  function showLagretView() {
+    document.getElementById('propList').style.display    = 'none';
+    document.getElementById('propCount').style.display   = 'none';
+    document.getElementById('lagretView').classList.add('active');
+    document.querySelectorAll('#listBottomNav .nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('navLagret').classList.add('active');
+    renderLagretList();
+  }
+
+  // ── Property data ──────────────────────────────────────────
+  const PROPS = {
+    '3': {
+      id: '3',
+      address: 'Fløyfjellveien 88, Bergen',
+      img: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80',
+      visningBadge: 'Visning lørdag 11:00',
+      price: '5 800 000 kr',
+      photos: '14 bilder',
+      nøkkel: [
+        { label: 'Adresse', value: 'Fløyfjellveien 88, 5018 Bergen', wide: true },
+        { label: 'Boligtype', value: 'Enebolig' },
+        { label: 'Eierform', value: 'Selveier' },
+        { label: 'Størrelse (BRA)', value: '205 m²' },
+        { label: 'Antall rom', value: '6 rom / 5 sov' },
+        { label: 'Byggeår', value: '1972' },
+        { label: 'Energimerke', value: 'C (Gul)', color: 'var(--color-warning)' },
+        { label: 'Totalpris', value: '6 027 500 kr', color: 'var(--color-positive)' },
+        { label: 'Fellesgjeld', value: 'Ingen' },
+        { label: 'Felleskostnader', value: 'Ingen' }
+      ],
+      features: [
+        { text: 'Panoramautsikt over Bergen og fjorden fra stue og terrasse', sub: 'Sørvendt tomt — gode solforhold hele dagen' },
+        { text: 'Romslig enebolig på 205 m² med 5 soverom — passer godt for familie', sub: 'Dobbelt garasje og stor hage på 612 m²' },
+        { text: 'Totalrenovert kjøkken og to bad (2019) — oppgradert til moderne standard', sub: 'Flislagte bad med gulvvarme' },
+        { text: 'Stille og grønt nabolag — 8 min gange til Byparken og buss', sub: 'Bergensdalen skole og barnehage i nærområdet' },
+        { text: 'Utleiedel i underetasjen med egen inngang og kjøkken', sub: 'Potensiell leieinntekt: ca. 12 000 kr/mnd' }
+      ],
+      tg: [
+        { level: 'tg2', title: 'Bad – tettesjikt og membran', desc: 'Begge bad er renovert i 2019, men tettesjikt nærmer seg 10-årsgrensen. Bør sjekkes av fagperson — en lekkasje kan gi store skader.' },
+        { level: 'tg2', title: 'Drenering rundt grunnmur', desc: 'Dreneringen er fra byggeåret (1972) og aldri skiftet. Høy risiko for fuktinnsig over tid. Utskiftning koster typisk 150 000–300 000 kr.' },
+        { level: 'tg2', title: 'Varmtvannsbereder – alder', desc: 'Berederen er fra 2007 (17 år). Forventet levetid er 15–20 år. Bør beregnes skiftet innen kort tid — kostnad ca. 10 000–15 000 kr.' },
+        { level: 'tg2', title: 'Vinduer – kondens mellom glass', desc: '3 vinduer har brutt forseglingen som gir dogg/kondens innvendig. Redusert isolasjonsevne. Utskiftning per vindu: ca. 3 000–8 000 kr.' },
+        { level: 'tg1', title: 'El-anlegg – eldre samsvarserklæring', desc: 'Samsvarserklæring foreligger, men er fra 2008. Anlegget fungerer, men bør få en ny el-kontroll ved eierskifte for å avdekke evt. avvik.' }
+      ],
+      econ: {
+        rows: [
+          { label: 'Prisantydning', value: '5 800 000 kr' },
+          { label: 'Fellesgjeld', value: '0 kr' },
+          { label: 'Dokumentavgift (2,5 %)', value: '145 000 kr' },
+          { label: 'Tinglysing / omkostninger', value: '7 958 kr' },
+          { label: 'Meglersalær (est.)', value: '74 542 kr' }
+        ],
+        total: '6 027 500 kr',
+        monthly: 'ca. 31 700 kr/mnd',
+        monthlySub: 'Med 20% egenkapital · 5% rente · 25 år nedbet.',
+        monthlyRows: [
+          { label: 'Renter (5 %)', value: '19 333 kr' },
+          { label: 'Avdrag', value: '7 680 kr' },
+          { label: 'Strøm (est. 205 m²)', value: '3 100 kr' },
+          { label: 'Kommunale avgifter', value: '1 100 kr' },
+          { label: 'Forsikring', value: '490 kr' }
+        ],
+        extraRow: { label: '–Leieinntekt (utleiedel)', value: '–12 000 kr', positive: true }
+      },
+      visning: {
+        chip: 'Visning lørdag 19. april kl. 11:00',
+        agent: { initials: 'KN', name: 'Kristin Nygård', company: 'Privatmegleren Bergen' },
+        checklist: [
+          { text: 'Sjekk lukt og fukt i underetasjen og kjeller — eldre drenering fra 1972', priority: 'high', priorityLabel: '⚠ Høy prioritet' },
+          { text: 'Ta med lommelykt — undersøk grunnmur for sprekker, saltutslag og fuktmerker', priority: 'high', priorityLabel: '⚠ Høy prioritet' },
+          { text: 'Test ventilasjonen på begge bad — kjenn etter trekk fra ventil', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Sjekk alle vinduer — se etter de 3 vinduene med kondens mellom glass', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Finn varmtvannsberederen og noter årstall — den er fra 2007', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Observer solforholdene på terrassen — visningen er kl. 11:00 (sørvendt)', priority: 'low', priorityLabel: '✓ Bonus-punkt' },
+          { text: 'Sjekk el-tavlen — noter alder og om det er sikringer eller automatsikringer', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Gå gjennom utleiedelen separat — vurder standard og leieinntektspotensial', priority: 'low', priorityLabel: '✓ Bonus-punkt' },
+          { text: 'Sjekk garasjen — se etter oljeflekker (lekkasje) og vurder stand på porter', priority: 'low', priorityLabel: '✓ Bonus-punkt' },
+          { text: 'Mål romstørrelser i de viktigste rommene — ta med målebånd eller bruk appen', priority: 'low', priorityLabel: '✓ Bonus-punkt' }
+        ],
+        questions: [
+          { cat: 'Byggteknisk', catColor: 'var(--color-warning)', catIcon: 'M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4', qs: [
+            'Dreneringen er original fra 1972 — er det gjort noen utbedringer eller undersøkelser av grunnmuren?',
+            'Hvilken leverandør utførte baderomsrenovasjonen i 2019 — finnes det dokumentasjon og garantier på arbeidet?',
+            'Er det gjort en ny el-kontroll etter 2008-samsvarserklæringen — og er det planer om dette ved eierskifte?',
+            'Vet selger om årsaken til kondens i de tre vinduene — er det aktuelt med prisavslag?'
+          ]},
+          { cat: 'Beliggenhet og nabolag', catColor: 'var(--color-primary)', catIcon: 'M12 2a8 8 0 0 1 8 8c0 5.4-7.1 12.3-7.7 12.8a.5.5 0 0 1-.6 0C11.1 22.3 4 15.4 4 10a8 8 0 0 1 8-8zM12 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6z', qs: [
+            'Er det planlagte reguleringsendringer eller utbyggingsprosjekter i nærområdet som kan påvirke utsikten?',
+            'Hvordan er støynivået fra veien — er det mye trafikk i rushtiden, spesielt om morgenen?',
+            'Finnes det parkeringsproblemer i gata eller begrensninger på bruken av innkjørselen?',
+            'Hva er grunnen til at selger selger — og hvor lenge har de bodd her?'
+          ]},
+          { cat: 'Praktisk og juridisk', catColor: 'var(--color-positive)', catIcon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8', qs: [
+            'Foreligger det ferdigattest for boligen og eventuelle tilbygg — inkludert garasjen og utleiedelen?',
+            'Hva følger med i kjøpet — er hvitevarene, lamper, utemøbler og garasjeportåpnere inkludert?',
+            'Er det tinglyst noen servitutter, bruksretter eller heftelser på eiendommen?',
+            'Forventer megler mange budgivere — og hva er selgers ønskede overtakelsesdato?'
+          ]}
+        ],
+        neighborCases: {
+          count: 2,
+          cases: [
+            {
+              address: 'Fløyfjellveien 90',
+              type: 'Søknad om tilbygg · Under behandling',
+              date: 'Feb 2025',
+              impact: 'medium',
+              impactLabel: 'Mulig påvirkning',
+              desc: 'Nabo søker om 28 m² tilbygg på to etasjer mot sørøst. Kan redusere ettermiddagssol på terrassen med 1–2 timer om vinteren ved lavt solstade. Utsikt mot fjorden vurderes upåvirket.'
+            },
+            {
+              address: 'Fløyfjellveien 86',
+              type: 'Søknad om frittliggende garasje · Godkjent',
+              date: 'Sep 2024',
+              impact: 'low',
+              impactLabel: 'Liten påvirkning',
+              desc: 'Frittliggende garasje på 24 m² plassert mot veikant. Ingen vesentlig effekt på solforhold eller utsikt fra boligen.'
+            }
+          ]
+        },
+        priceAnalysis: {
+          listed: '5 800 000 kr',
+          estimated: '5 500 000 kr',
+          listedRaw: 5800000,
+          estimatedRaw: 5500000,
+          verdict: 'overpriced',
+          verdictLabel: 'Noe overpriset',
+          verdictSub: 'Dreneringen fra 1972 og TG2-funnene trekker ned markedsverdien. Vi estimerer ca. 5% over reell markedsverdi.',
+          bidRange: '5 400 000 – 5 600 000 kr',
+          startBid: '5 300 000 kr',
+          competition: 'Moderat konkurranse',
+          competitionLevel: 'medium',
+          strategy: 'Bruk TG2-funnene aktivt — dreneringen fra 1972 alene kan rettferdiggjøre 150 000–300 000 kr i prisreduksjon. Start budrunden på 5 300 000 kr og hold deg under 5 600 000 kr med mindre konkurransen tilsier noe annet.'
+        }
+      }
+    },
+    '8': {
+      id: '8',
+      address: 'Mindemyren 23, Bergen',
+      img: 'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=800&q=80',
+      visningBadge: 'Visning søndag 11:00',
+      price: '3 600 000 kr',
+      photos: '10 bilder',
+      nøkkel: [
+        { label: 'Adresse', value: 'Mindemyren 23, 5068 Bergen', wide: true },
+        { label: 'Boligtype', value: 'Leilighet' },
+        { label: 'Eierform', value: 'Sameie' },
+        { label: 'Størrelse (BRA)', value: '65 m²' },
+        { label: 'Antall rom', value: '2 rom / 1 sov' },
+        { label: 'Byggeår', value: '2015' },
+        { label: 'Energimerke', value: 'B (Grønn)', color: 'var(--color-positive)' },
+        { label: 'Totalpris', value: '3 897 958 kr', color: 'var(--color-positive)' },
+        { label: 'Fellesgjeld', value: '280 000 kr' },
+        { label: 'Felleskostnader', value: '3 800 kr/mnd' }
+      ],
+      features: [
+        { text: 'Moderne leilighet fra 2015 — lav vedlikeholdsrisiko og energieffektiv', sub: 'Energimerke B — estimert strøm ca. 1 100 kr/mnd' },
+        { text: 'Attraktiv beliggenhet på Minde — 5 min til Danmarksplass og bybanen', sub: 'Rask tilgang til Bergen sentrum og Lagunen via bane' },
+        { text: 'Vestvendt balkong med ettermiddagssol', sub: 'Rolig bakgård med felles sykkelparkering og søppelhåndtering' },
+        { text: 'Åpen stue-/kjøkkenløsning med god planløsning for 2-romsleilighet', sub: 'Parkett i stue, fliser på bad med gulvvarme' },
+        { text: 'Solid sameie med god økonomi — ingen planlagte store rehabiliteringer', sub: 'Fellesgjeld under gjennomsnittet for området' }
+      ],
+      tg: [
+        { level: 'tg1', title: 'Bad – god stand', desc: 'Badet ble ferdigstilt i 2015 og er i god stand. Tettesjikt og membran er innenfor forventet levetid. Ingen avvik observert.' },
+        { level: 'tg1', title: 'El-anlegg – nytt og godkjent', desc: 'El-anlegg fra 2015 med gyldig samsvarserklæring. Automatsikringer og moderne kurser. Ingen avvik.' },
+        { level: 'tg2', title: 'Fellesarealer – trappegang', desc: 'Noe slitasje på maling og gulvbelegg i trappegangen. Sameiet har planlagt maling i 2025 — kostnadsandel ca. 3 500 kr per boenhet.' },
+        { level: 'tg1', title: 'Vinduer – tett og i god stand', desc: 'Trelags-vinduer fra 2015. Ingen kondens, sprekker eller avvik observert. God isolasjonsevne.' },
+        { level: 'tg1', title: 'Varmtvannsbereder – felles', desc: 'Sameiet har felles varmtvannssystem. Ingen kostnad for individuell bereder. Vedlikeholdes av sameiet.' }
+      ],
+      econ: {
+        rows: [
+          { label: 'Prisantydning', value: '3 600 000 kr' },
+          { label: 'Fellesgjeld (andel)', value: '280 000 kr' },
+          { label: 'Tinglysing / omkostninger', value: '7 958 kr' },
+          { label: 'Andelsgebyr (sameie)', value: '10 000 kr' },
+          { label: 'Meglersalær (est.)', value: '0 kr inkl.' }
+        ],
+        total: '3 897 958 kr',
+        monthly: 'ca. 21 000 kr/mnd',
+        monthlySub: 'Med 20% egenkapital · 5% rente · 25 år nedbet.',
+        monthlyRows: [
+          { label: 'Renter (5 %)', value: '12 000 kr' },
+          { label: 'Avdrag', value: '4 800 kr' },
+          { label: 'Felleskostnader', value: '3 800 kr' },
+          { label: 'Strøm (est. 65 m²)', value: '1 100 kr' },
+          { label: 'Innboforsikring', value: '200 kr' }
+        ],
+        extraRow: null
+      },
+      visning: {
+        chip: 'Visning søndag 20. april kl. 11:00',
+        agent: { initials: 'MA', name: 'Martin Aarnes', company: 'EIE Eiendomsmegling Bergen' },
+        checklist: [
+          { text: 'Sjekk lydforhold mellom etasjer — test ved å gå rundt i leiligheten', priority: 'high', priorityLabel: '⚠ Høy prioritet' },
+          { text: 'Spør om naboforhold og beboersammensetning i bygget', priority: 'high', priorityLabel: '⚠ Høy prioritet' },
+          { text: 'Sjekk balkongen — vurder tilstand på rekkverk, gulv og drenering', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Finn boden / lagringsplass — noter størrelse og tilgjengelighet', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Sjekk mobildekning og internettmuligheter (fiberinntak?)', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Observer ettermiddagssol på balkongen — visningen er kl. 11:00 (vestvendt)', priority: 'low', priorityLabel: '✓ Bonus-punkt' },
+          { text: 'Sjekk el-tavlen — noter om det er kapasitet for elbil-lader', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Undersøk parkering — er det inkludert i kjøpet eller leies det separat?', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Mål stue og soverom — vurder møbleringsfleksibilitet', priority: 'low', priorityLabel: '✓ Bonus-punkt' },
+          { text: 'Sjekk søppelsorteringsordningen og sykkelparkering i kjeller', priority: 'low', priorityLabel: '✓ Bonus-punkt' }
+        ],
+        questions: [
+          { cat: 'Sameie og økonomi', catColor: 'var(--color-warning)', catIcon: 'M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6', qs: [
+            'Hva er sameiets totale fellesgjeld og er det planlagte store rehabiliteringsprosjekter de neste 5 årene?',
+            'Hva dekker felleskostnadene — inkluderer de vann, internett, vaktmester og forsikring?',
+            'Er det vedtatt eller diskutert økning av felleskostnader på kommende sameiemøte?',
+            'Finnes det årsregnskap og møteprotokoll fra siste to år — og kan disse oversendes?'
+          ]},
+          { cat: 'Beliggenhet og nabolag', catColor: 'var(--color-primary)', catIcon: 'M12 2a8 8 0 0 1 8 8c0 5.4-7.1 12.3-7.7 12.8a.5.5 0 0 1-.6 0C11.1 22.3 4 15.4 4 10a8 8 0 0 1 8-8zM12 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6z', qs: [
+            'Hva er støynivå fra Mindemyrveien og nærliggende næringsbygg i dagstid?',
+            'Er det planlagte utbyggingsprosjekter i Mindemyren-området som kan påvirke utsikt eller støy?',
+            'Hvordan fungerer tilgangen til bybanen — er det trygg gangforbindelse fra bygget?',
+            'Hva er grunnen til at selger selger — og ønskes rask overtakelse?'
+          ]},
+          { cat: 'Praktisk og juridisk', catColor: 'var(--color-positive)', catIcon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8', qs: [
+            'Er parkeringsplass inkludert i prisen — eller kjøpes/leies den separat?',
+            'Hva følger med i kjøpet — hvitevarer, garderobeskap, belysning?',
+            'Finnes det tinglyst ladepunkt for el-bil, eller er infrastruktur etablert i garasjen?',
+            'Er leiligheten godkjent for utleie — og har sameiet restriksjoner på korttidsutleie (Airbnb)?'
+          ]}
+        ],
+        neighborCases: {
+          count: 1,
+          cases: [
+            {
+              address: 'Mindemyrveien 10–16 (næringsbygg)',
+              type: 'Reguleringsplan under behandling',
+              date: 'Jan 2025',
+              impact: 'high',
+              impactLabel: 'Bør undersøkes',
+              desc: 'Ny reguleringsplan tillater næringsbygg opp til 6 etasjer på naboeiendommen mot vest. Dersom planen vedtas kan kveldssol og utsikt vestover fra balkongen bli vesentlig redusert. Saken er under politisk behandling.'
+            }
+          ]
+        },
+        priceAnalysis: {
+          listed: '3 600 000 kr',
+          estimated: '3 750 000 kr',
+          listedRaw: 3600000,
+          estimatedRaw: 3750000,
+          verdict: 'underpriced',
+          verdictLabel: 'Priset under markedsverdi',
+          verdictSub: 'Ny leilighet fra 2015 i attraktivt bybanenabolag. Vi estimerer at boligen er priset ca. 4% under reell markedsverdi — forvent budkonkurranse.',
+          bidRange: '3 700 000 – 3 850 000 kr',
+          startBid: '3 650 000 kr',
+          competition: 'Høy konkurranse',
+          competitionLevel: 'high',
+          strategy: 'Moderne leilighet med få feil og god beliggenhet vil trekke mange budgivere. Vær klar til å by over prisantydning. Start nær 3 650 000 kr, men ha 3 800 000 kr som psykologisk tak med mindre du virkelig vil ha den.'
+        }
+      }
+    }
+    ,
+    '9': {
+      id: '9',
+      address: 'Bjørkåsen 20, Nesttun',
+      img: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80',
+      visningBadge: 'Visning mandag 17:00',
+      price: '5 000 000 kr',
+      photos: '18 bilder',
+      nøkkel: [
+        { label: 'Adresse', value: 'Bjørkåsen 20, 5228 Nesttun', wide: true },
+        { label: 'Boligtype', value: 'Enebolig' },
+        { label: 'Eierform', value: 'Selveier (festet tomt)' },
+        { label: 'Størrelse (BRA)', value: '144 m²' },
+        { label: 'Antall rom', value: '5 rom / 4 sov' },
+        { label: 'Byggeår', value: '1965' },
+        { label: 'Energimerke', value: 'G (Rød)', color: 'var(--color-negative)' },
+        { label: 'Totalpris inkl. omk.', value: '5 017 990 kr', color: 'var(--color-positive)' },
+        { label: 'Tomt', value: '1 224,7 m² (festet)' },
+        { label: 'Festeavgift', value: '4 660 kr/år' }
+      ],
+      features: [
+        { text: 'Romslig enebolig med stort potensial — 1 225 m² tomt på Nesttun', sub: 'Barnevennlig og etablert nabolag nær Lagunen og Nesttun sentrum' },
+        { text: '4 soverom og 144 m² BRA — god plass for hele familien', sub: 'Terrasse på 29 m² og hage med gode utearealer' },
+        { text: 'Ny kjøkkeninnredning fra 2022 — moderne og funksjonelt', sub: 'Varmepumpe og peis gir effektiv og koselig oppvarming' },
+        { text: 'Attraktiv beliggenhet — lett tilgang til Lagunen og Nesttun', sub: 'Gode kollektivforbindelser og kort vei til skoler og barnehager' },
+        { text: 'Selveiertomt med festeavtale — lav festeavgift på 4 660 kr/år', sub: 'Mulighet for innløsing av festetomt etter tomtefesteloven' }
+      ],
+      tg: [
+        { level: 'tg3', title: 'Terrasse – råte og strukturelle skader', desc: 'Terrassen har synlige råteskader i bærende konstruksjoner og bord. Utskiftning er nødvendig. Estimert kostnad: 100 000–300 000 kr.' },
+        { level: 'tg3', title: 'Nedløp og beslag – korrosjon og lekkasjer', desc: 'Nedløp og takbeslag er sterkt korroderte med dokumenterte lekkasjer. Må skiftes snarest for å unngå vanninnsig i konstruksjonen. Estimert kostnad: 100 000–300 000 kr.' },
+        { level: 'tg2', title: 'Bad – tettesjikt og slitasje', desc: 'Badet har synlig slitasje og tettesjiktet er fra byggeperioden. Bør totalrenoveres. Estimert kostnad: 200 000–500 000 kr.' },
+        { level: 'tg2', title: 'Vaskerom – fukt og ventilasjon', desc: 'Vaskerommet har tegn på fuktskader og mangelfull ventilasjon. Utbedring anbefales. Estimert kostnad: 100 000–200 000 kr.' },
+        { level: 'tg2', title: 'Takkonstruksjon – slitasje og alder', desc: 'Takkonstruksjonen er fra 1965 og bærer preg av alder. Noen synlige deformasjoner. Bør vurderes av takstmann for nødvendige tiltak.' },
+        { level: 'tg2', title: 'Innvendige vegger – sprekker', desc: 'Sprekkdannelser i innvendige vegger — trolig setningsskader. Bør kartlegges nærmere av fagperson.' }
+      ],
+      econ: {
+        rows: [
+          { label: 'Prisantydning', value: '5 000 000 kr' },
+          { label: 'Dokumentavgift (2,5 %)', value: '125 000 kr' },
+          { label: 'Tinglysing / omkostninger', value: '7 958 kr' },
+          { label: 'Meglersalær (est.)', value: '~85 000 kr' },
+          { label: 'Festeavgift (pr. år)', value: '4 660 kr/år' }
+        ],
+        total: '5 017 990 kr',
+        monthly: 'ca. 29 500 kr/mnd',
+        monthlySub: 'Med 20% egenkapital · 5% rente · 25 år nedbet.',
+        monthlyRows: [
+          { label: 'Renter (5 %)', value: '16 667 kr' },
+          { label: 'Avdrag', value: '6 667 kr' },
+          { label: 'Kommunale avgifter', value: '1 067 kr' },
+          { label: 'Eiendomsskatt', value: '610 kr' },
+          { label: 'Strøm (est. 144 m²)', value: '3 800 kr' },
+          { label: 'Festeavgift', value: '388 kr' },
+          { label: 'Forsikring', value: '600 kr' }
+        ],
+        extraRow: null
+      },
+      visning: {
+        chip: 'Visning mandag 22. april kl. 17:00',
+        agent: { initials: 'SB', name: 'Stian Bruaas', company: 'Fana Sparebank Eiendom' },
+        checklist: [
+          { text: 'Inspiser terrassen nøye — kjenn etter svikt i gulvbord og sjekk bærende konstruksjoner for råte', priority: 'high', priorityLabel: '⚠ Høy prioritet' },
+          { text: 'Sjekk nedløp og takbeslag rundt hele bygget — se etter rustflekker, sprekker og lekkasjetegn', priority: 'high', priorityLabel: '⚠ Høy prioritet' },
+          { text: 'Undersøk badet grundig — sjekk fukt under klinker og ventilasjonens funksjon', priority: 'high', priorityLabel: '⚠ Høy prioritet' },
+          { text: 'Ta med lommelykt — gå inn på loftet og inspiser takkonstruksjonen for deformasjoner og fukt', priority: 'high', priorityLabel: '⚠ Høy prioritet' },
+          { text: 'Sjekk vaskerommet — sniff etter mugglukt og se etter fuktmerker bak maskinen', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Dokumenter sprekkdannelsene i innvendige vegger — ta bilder og spør selger om historikk', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Finn festekontrakten — noter festeavgift, indeksregulering og vilkår for innløsing', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Test varmepumpen og peisen — sjekk at begge virker og be om servicehistorikk', priority: 'medium', priorityLabel: '◆ Middels prioritet' },
+          { text: 'Mål rommene — spesielt soverommene — og vurder plassutnyttelse', priority: 'low', priorityLabel: '✓ Bonus-punkt' },
+          { text: 'Gå rundt tomten og vurder hagepotensialet — sjekk sol- og utsiktsforhold', priority: 'low', priorityLabel: '✓ Bonus-punkt' }
+        ],
+        questions: [
+          { cat: 'Byggteknisk', catColor: 'var(--color-warning)', catIcon: 'M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4', qs: [
+            'Har selger innhentet tilbud på utskiftning av terrassen og nedløp — og er prisestimatene i tilstandsrapporten bekreftet av håndverkere?',
+            'Er det gjort noen tiltak på takkonstruksjonen siden byggeåret 1965 — og finnes det dokumentasjon på evt. omlegging av tak?',
+            'Hva er historikken bak sprekkdannelsene i innvendige vegger — er årsaken undersøkt og utbedret?',
+            'Er det utstedt ferdigattest for huset og eventuelle tilbygg eller endringer gjort etter 1965?'
+          ]},
+          { cat: 'Festetomt og juridisk', catColor: 'var(--color-warning)', catIcon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8', qs: [
+            'Hvem eier festetomten — og kan den innløses til markedspris etter tomtefesteloven?',
+            'Når utløper festekontrakten og på hvilke vilkår kan den forlenges — er festeavgiften indeksregulert?',
+            'Er det tinglyst noen heftelser, servitutter eller naboavtaler som følger eiendommen?',
+            'Forventer megler mange budgivere — og hva er selgers ønskede overtakelsesdato?'
+          ]},
+          { cat: 'Oppussing og kostnader', catColor: 'var(--color-negative)', catIcon: 'M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6', qs: [
+            'Har selger innhentet anbud på baderomsrenovasjon — og er det rom for prisavslag gitt TG2 og TG3-funnene?',
+            'Er kjøkkeninnredningen fra 2022 utført av godkjent håndverker med dokumentasjon og garanti?',
+            'Hva er kommunale avgifter og eiendomsskatt for 2025 — og er disse stabile eller forventet å øke?',
+            'Er det planer for utbygging i nabolaget som kan påvirke tomteverdien eller utsikten negativt?'
+          ]}
+        ],
+        neighborCases: {
+          count: 0,
+          cases: []
+        },
+        priceAnalysis: {
+          listed: '5 000 000 kr',
+          estimated: '4 500 000 kr',
+          listedRaw: 5000000,
+          estimatedRaw: 4500000,
+          verdict: 'overpriced',
+          verdictLabel: 'Betydelig overpriset',
+          verdictSub: 'To TG3-funn (terrasse og nedløp) med estimerte utbedringskostnader på 200 000–600 000 kr. Festet tomt reduserer også markedsverdi. Vi estimerer ca. 10% over reell markedsverdi.',
+          bidRange: '4 300 000 – 4 600 000 kr',
+          startBid: '4 200 000 kr',
+          competition: 'Lav konkurranse',
+          competitionLevel: 'low',
+          strategy: 'TG3-funnene gir deg sterk forhandlingsposisjon. Terrasse og nedløp alene estimeres til 200 000–600 000 kr i utbedringer — bruk dette aktivt i budrunden. Start på 4 200 000 kr. Ikke la deg presse over 4 600 000 kr uten pristilbud fra håndverker.'
+        }
+      }
+    }
+  };
+
+  // ── Render detail view for a property ─────────────────────
+  function renderDetail(p) {
+    // Hero
+    document.getElementById('heroImg').src = p.img;
+    document.getElementById('heroImg').alt = p.address;
+    document.getElementById('heroBadge').textContent = p.visningBadge;
+    document.getElementById('heroPrice').textContent = p.price;
+    document.getElementById('heroPhotoCount').innerHTML =
+      `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><polyline points="21 15 16 10 5 21"/></svg>${p.photos}`;
+
+    // Header address
+    document.querySelector('.header-address').textContent = p.address;
+
+    // ── TAB OVERSIKT ──
+    const nøkkelHTML = p.nøkkel.map(item =>
+      `<div class="info-item${item.wide ? ' wide' : ''}">
+        <div class="info-label">${item.label}</div>
+        <div class="info-value"${item.color ? ` style="color:${item.color}"` : ''}>${item.value}</div>
+      </div>`
+    ).join('');
+
+    const featuresHTML = p.features.map(f =>
+      `<div class="feature-item">
+        <div class="feature-bullet"></div>
+        <div>
+          <div class="feature-text">${f.text}</div>
+          <div class="feature-sub">${f.sub}</div>
+        </div>
+      </div>`
+    ).join('');
+
+    const tgHTML = p.tg.map(t =>
+      `<div class="tg-item">
+        <span class="tg-badge ${t.level}">${t.level.toUpperCase()}</span>
+        <div class="tg-content">
+          <div class="tg-title">${t.title}</div>
+          <div class="tg-desc">${t.desc}</div>
+        </div>
+      </div>`
+    ).join('');
+
+    const econRowsHTML = p.econ.rows.map(r =>
+      `<div class="econ-row"><span class="econ-label">${r.label}</span><span class="econ-value">${r.value}</span></div>`
+    ).join('');
+
+    const monthlyRowsHTML = p.econ.monthlyRows.map(r =>
+      `<div class="monthly-row"><span>${r.label}</span><span>${r.value}</span></div>`
+    ).join('');
+
+    const extraRowHTML = p.econ.extraRow
+      ? `<div class="monthly-row" style="margin-top:4px;padding-top:6px;border-top:1px solid var(--color-outline)">
+          <span style="color:var(--color-positive);font-weight:600">${p.econ.extraRow.label}</span>
+          <span style="color:var(--color-positive);font-weight:600">${p.econ.extraRow.value}</span>
+        </div>`
+      : '';
+
+    document.getElementById('tab-oversikt').innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Nøkkelinfo</div>
+            <div class="card-subtitle">Alle fakta på ett sted</div>
+          </div>
+        </div>
+        <div class="info-grid">${nøkkelHTML}</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon green">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Det beste med boligen</div>
+            <div class="card-subtitle">Positive trekk fra annonsen</div>
+          </div>
+        </div>
+        <div class="feature-list">${featuresHTML}</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon yellow">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Dette bør du være obs på</div>
+            <div class="card-subtitle">Funn fra tilstandsrapporten</div>
+          </div>
+        </div>
+        <div class="tg-list">${tgHTML}</div>
+      </div>
+      ${(() => {
+        const nc = p.visning.neighborCases;
+        if (!nc) return '';
+        const iconWarn = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;flex-shrink:0;color:var(--color-negative)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+        const iconCheck = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:22px;height:22px"><polyline points="20 6 9 17 4 12"/></svg>`;
+        const hasHigh = nc.cases.some(c => c.impact === 'high');
+        const headerColor = nc.count === 0 ? 'green' : hasHigh ? 'red' : 'yellow';
+        const subtitle = nc.count === 0
+          ? 'Ingen aktive søknader funnet i nærområdet'
+          : `${nc.count} søknad${nc.count > 1 ? 'er' : ''} funnet hos naboer`;
+
+        const casesHTML = nc.cases.map(c => `
+          <div class="neighbor-case-item ${c.impact}">
+            <div class="neighbor-case-top">
+              <div class="neighbor-case-address">${c.address}</div>
+              <span class="neighbor-impact-badge ${c.impact}">${c.impactLabel}</span>
+            </div>
+            <div class="neighbor-case-meta">${c.type} · ${c.date}</div>
+            <div class="neighbor-case-desc">${c.desc}</div>
+          </div>`).join('');
+
+        const emptyHTML = nc.count === 0 ? `
+          <div class="neighbor-cases-empty">
+            ${iconCheck}
+            <div>
+              <div class="neighbor-cases-empty-text">Ingen søknader i nærområdet</div>
+              <div class="neighbor-cases-empty-sub">Søk bekreftet via Saksinnsyn, Bergen kommune</div>
+            </div>
+          </div>` : '';
+
+        return `<div class="card">
+          <div class="card-header">
+            <div class="card-icon ${headerColor}">
+              <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><circle cx="19" cy="9" r="4" fill="rgba(254,77,91,0.2)" stroke="var(--color-negative)" stroke-width="1.5"/><line x1="19" y1="7" x2="19" y2="9" stroke="var(--color-negative)" stroke-width="1.5"/><circle cx="19" cy="11" r="0.5" fill="var(--color-negative)" stroke="none"/></svg>
+            </div>
+            <div>
+              <div class="card-title">Nabosøknader og planendringer</div>
+              <div class="card-subtitle">${subtitle}</div>
+            </div>
+          </div>
+          ${nc.count > 0 ? `<div class="neighbor-case-list">${casesHTML}</div>` : emptyHTML}
+          <div class="neighbor-source">Kilde: Saksinnsyn · Bergen kommune · solgt.no</div>
+        </div>`;
+      })()}
+      ${(() => {
+        const pa = p.visning.priceAnalysis;
+        if (!pa) return '';
+        const diffAbs = Math.abs(pa.listedRaw - pa.estimatedRaw);
+        const diffPct = Math.round(Math.abs(pa.listedRaw - pa.estimatedRaw) / pa.estimatedRaw * 100);
+        const overIcon = `<svg class="price-verdict-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+        const underIcon = `<svg class="price-verdict-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`;
+        const fairIcon = `<svg class="price-verdict-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
+        const icon = pa.verdict === 'overpriced' ? overIcon : pa.verdict === 'underpriced' ? underIcon : fairIcon;
+        return `<div class="card">
+          <div class="card-header">
+            <div class="card-icon ${pa.verdict === 'overpriced' ? 'red' : pa.verdict === 'underpriced' ? 'green' : 'blue'}">
+              <svg viewBox="0 0 24 24" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <div>
+              <div class="card-title">Prisanalyse</div>
+              <div class="card-subtitle">Lagt ut vs. estimert markedsverdi</div>
+            </div>
+          </div>
+          <div class="price-compare">
+            <div class="price-col">
+              <div class="price-col-label">Prisantydning</div>
+              <div class="price-col-value">${pa.listed}</div>
+            </div>
+            <div class="price-col">
+              <div class="price-col-label">Bulder-estimat</div>
+              <div class="price-col-value highlight">${pa.estimated}</div>
+            </div>
+          </div>
+          <div class="price-verdict ${pa.verdict}">
+            ${icon}
+            <div>
+              <div class="price-verdict-title">${pa.verdictLabel} · ${diffPct}% (${diffAbs.toLocaleString('no')} kr)</div>
+              <div class="price-verdict-sub">${pa.verdictSub}</div>
+            </div>
+          </div>
+        </div>`;
+      })()}
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon purple">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Økonomi-oversikt</div>
+            <div class="card-subtitle">Totalbeløp og månedskostnader</div>
+          </div>
+        </div>
+        <div class="econ-rows">
+          ${econRowsHTML}
+          <div class="econ-row total">
+            <span class="econ-label">Estimert totalkostnad</span>
+            <span class="econ-value">${p.econ.total}</span>
+          </div>
+        </div>
+        <div class="monthly-block">
+          <div class="monthly-title">Estimerte månedskostnader</div>
+          <div class="monthly-total">${p.econ.monthly}</div>
+          <div class="monthly-sub">${p.econ.monthlySub}</div>
+          <div class="monthly-breakdown">
+            ${monthlyRowsHTML}
+            ${extraRowHTML}
+          </div>
+        </div>
+      </div>`;
+
+    // ── TAB VISNING ──
+    const checklistHTML = p.visning.checklist.map(item =>
+      `<div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <div class="check-text">${item.text}</div>
+          <div class="check-priority ${item.priority}">${item.priorityLabel}</div>
+        </div>
+      </div>`
+    ).join('');
+
+    const totalQ = p.visning.questions.reduce((sum, cat) => sum + cat.qs.length, 0);
+    let qNum = 1;
+    const questionsHTML = p.visning.questions.map((cat, i) => {
+      const qListHTML = cat.qs.map(q => {
+        const num = qNum++;
+        return `<div class="q-item">
+          <div class="q-num">${num}</div>
+          <div class="q-text">${q}</div>
+          <button class="q-copy-btn"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>`;
+      }).join('');
+      return `${i > 0 ? '<div class="section-sep"></div>' : ''}
+      <div class="q-category"${i > 0 ? ' style="margin-top: var(--space-large)"' : ''}>
+        <div class="q-category-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" stroke="${cat.catColor}" fill="none" stroke-width="2"><path d="${cat.catIcon}"/></svg>
+          <span class="q-category-label">${cat.cat}</span>
+        </div>
+        <div class="q-list">${qListHTML}</div>
+      </div>`;
+    }).join('');
+
+    const pa = p.visning.priceAnalysis;
+    const bidCardHTML = pa ? `
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon ${pa.verdict === 'overpriced' ? 'red' : pa.verdict === 'underpriced' ? 'green' : 'blue'}">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Realistisk budpris</div>
+            <div class="card-subtitle">Basert på tilstand og sammenlignbare salg</div>
+          </div>
+        </div>
+        <div class="bid-range-box">
+          <div class="bid-range-label">Anbefalt budrange</div>
+          <div class="bid-range-value">${pa.bidRange}</div>
+        </div>
+        <div class="bid-meta-row">
+          <div class="bid-meta-item">
+            <div class="bid-meta-label">Startbud</div>
+            <div class="bid-meta-value">${pa.startBid}</div>
+          </div>
+          <div class="bid-meta-item">
+            <div class="bid-meta-label">Konkurranse</div>
+            <div class="bid-meta-value"><span class="competition-dot ${pa.competitionLevel}"></span>${pa.competition}</div>
+          </div>
+        </div>
+        <div class="bid-strategy-box">
+          <div class="bid-strategy-label">Bulder-strategi</div>
+          <div class="bid-strategy-text">${pa.strategy}</div>
+        </div>
+      </div>` : '';
+
+    document.getElementById('tab-visning').innerHTML = `
+      <div class="visning-chip">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        ${p.visning.chip}
+      </div>
+      ${bidCardHTML}
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon green">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Sjekkliste for visningen</div>
+            <div class="card-subtitle">Basert på tilstandsrapport og boligens alder</div>
+          </div>
+        </div>
+        <div class="progress-row">
+          <span class="progress-label">Fullførte punkter</span>
+          <span class="progress-count" id="checkCount">0 / ${p.visning.checklist.length}</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+        <div class="checklist" id="checklist">${checklistHTML}</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">
+            <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Spørsmål til megler</div>
+            <div class="card-subtitle">${totalQ} konkrete spørsmål — klar til visning</div>
+          </div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-avatar">${p.visning.agent.initials}</div>
+          <div class="agent-info">
+            <div class="agent-name">${p.visning.agent.name}</div>
+            <div class="agent-company">${p.visning.agent.company}</div>
+          </div>
+          <div class="agent-actions">
+            <button class="agent-btn" title="Ring">
+              <svg viewBox="0 0 24 24" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.41 2 2 0 0 1 3.59 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l1.16-1.16a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </button>
+            <button class="agent-btn" style="background:var(--color-surface-container-high)" title="Melding">
+              <svg viewBox="0 0 24 24" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </button>
+          </div>
+        </div>
+        ${questionsHTML}
+      </div>`;
+  }
+
+  // ── Screen navigation ──────────────────────────────────────
+  function openDetail(cardEl) {
+    const propData = PROPS[cardEl.dataset.id];
+    if (propData) {
+      renderDetail(propData);
+    } else {
+      // Fallback: just show address from card data
+      document.querySelector('.header-address').textContent = cardEl.dataset.address;
+    }
+    document.getElementById('screensWrapper').style.transform = 'translateX(-375px)';
+    document.getElementById('mainScroll').scrollTop = 0;
+    const firstTab = document.querySelector('#screenDetail .tab-item');
+    switchTab('oversikt', firstTab);
+  }
+
+  function openDetailFromCard(cardEl) {
+    openDetail(cardEl);
+  }
+
+  function goBack() {
+    document.getElementById('screensWrapper').style.transform = 'translateX(0)';
+  }
+
+  // ── Filter chips ───────────────────────────────────────────
+  function filterType(btn, type) {
+    document.querySelectorAll('#screenList .filter-chip:not(.has-filter)').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    showListView();
+    const cards = document.querySelectorAll('#propList .prop-card');
+    let visible = 0;
+    cards.forEach(card => {
+      const show = type === 'alle' || card.dataset.type === type;
+      card.style.display = show ? 'block' : 'none';
+      if (show) visible++;
+    });
+    document.getElementById('propCount').textContent =
+      visible + ' bolig' + (visible !== 1 ? 'er' : '') + ' · Bergen og omegn';
+  }
+
+  function openFilter() { /* placeholder */ }
+
+  // Init badge
+  updateSavedBadge();
+
+  // ── Tab switching ──────────────────────────────────────────
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+    btn.classList.add('active');
+    document.getElementById('mainScroll').scrollTop = 0;
+  }
+
+  // Checklist toggle
+  function toggleCheck(item) {
+    item.classList.toggle('checked');
+    updateProgress();
+  }
+
+  // Sparkline period pills
+  function setPeriod(btn, period) {
+    document.querySelectorAll('.period-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function updateProgress() {
+    const items = document.querySelectorAll('.check-item');
+    const checked = document.querySelectorAll('.check-item.checked').length;
+    const total = items.length;
+    document.getElementById('checkCount').textContent = checked + ' / ' + total;
+    document.getElementById('progressFill').style.width = (checked / total * 100) + '%';
+  }
+</script>
+
+</body>
+</html>
